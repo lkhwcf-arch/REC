@@ -105,3 +105,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+.vscode/extensions.json
+.vscode/launch.json
+.vscode/settings.json
