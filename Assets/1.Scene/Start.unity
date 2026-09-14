@@ -783,6 +783,7 @@ GameObject:
   m_Component:
   - component: {fileID: 546068912}
   - component: {fileID: 546068911}
+  - component: {fileID: 546068913}
   m_Layer: 0
   m_Name: ButtonManager
   m_TagString: Untagged
@@ -802,7 +803,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfc8f9e6c9661e74a9f561eabce45d37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ButtonManager
-  menuView: {fileID: 188368361}
 --- !u!4 &546068912
 Transform:
   m_ObjectHideFlags: 0
@@ -818,6 +818,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &546068913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 546068910}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2008e3c244cc684aacf14c844fc4da9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StartMenuBootstrapper
+  menuView: {fileID: 188368361}
+  gameSceneName: InGame
 --- !u!1 &730951899
 GameObject:
   m_ObjectHideFlags: 0
