@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 enum ButtonType
@@ -10,60 +11,21 @@ enum ButtonType
 
 public class ButtonManager : MonoBehaviour
 {
-    public static ButtonManager Instance { get; private set; }
-    [SerializeField] private StartMenuView menuView;
-    [SerializeField]
-    private string gameSceneName = "InGame";
-    private MenuModel menuModel;
+    private StartMenuView menuView;
     private MenuController menuController;
 
-
-    private void Awake()
+    public void Initialize(StartMenuView view, MenuController controller)
     {
-        // 이미 다른 인스턴스가 존재하는 경우, 현재 인스턴스를 파괴
-        if (Instance != null && Instance != this)
+        if (controller == null)
         {
-            Destroy(gameObject);
-            return;
+            throw new ArgumentNullException(nameof(controller), "MenuController가 null입니다.");
         }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-        // inspector 연결 여부를 확인
-        if (menuView == null || !menuView.IsConfigured)
+        if (view == null || !view.IsConfigured)
         {
-            Debug.LogWarning("[ButtonManager] StartMenuView가 할당되지 않았거나, 구성되지 않았습니다.");
-            return;
+            throw new ArgumentException("StartMenuView가 초기화되지 않았거나 null입니다.", nameof(view));
         }
-        // 기존 패널의 활성상태와 동일하게 model을 만든다.
-        menuModel = new MenuModel(menuView.IsExplanationPanelOpen);
-        //위에서 만든 모델을 컨트롤러에 전달
-        menuController = new MenuController(menuModel, new MenuNavigation(gameSceneName));
-        // 모델 상태가 바뀌면 하면 표시 함수를 실행
-        menuModel.ExplanationChanged += OnExplanationChanged;
-        // 최초 화면 상태도 모델과 맟춰서 표시
-        OnExplanationChanged(menuModel.IsExplanationPanelOpen);
-    }
-
-    private void OnExplanationChanged(bool isOpen)
-    {
-        if (menuView == null)
-            return;
-
-        menuView.RenderExplanation(isOpen);
-    }
-
-    private void OnDestroy()
-    {
-        if (menuModel != null)
-        {
-            menuModel.ExplanationChanged -= OnExplanationChanged;
-        }
-
-        if (Instance == this)
-        {
-            Instance = null;
-        }
+        menuController = controller;
+        menuView = view;
     }
 
     public void OpenPanel(GameObject panel)

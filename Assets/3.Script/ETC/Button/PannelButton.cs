@@ -4,27 +4,25 @@ using UnityEngine;
 
 public class PannelButton : MonoBehaviour
 {
-    [SerializeField] private GameObject targetPanel;
+    [SerializeField] private ButtonManager buttonManager;
+    [SerializeField] GameObject targetPanel;
 
     public void Open()
     {
-        if (ButtonManager.Instance == null)
+        if (buttonManager == null)
         {
-            Debug.LogError("씬에 ButtonManager가 없습니다.", this);
+            Debug.LogError("[PannelButton] ButtonManager를 연결 하세요", this);
             return;
         }
-
-        ButtonManager.Instance.OpenPanel(targetPanel);
+        buttonManager.OpenPanel(targetPanel);
     }
-
     public void Close()
     {
-        if (ButtonManager.Instance == null)
+        if (buttonManager == null)
         {
-            Debug.LogError("씬에 ButtonManager가 없습니다.", this);
+            Debug.LogError("[PannelButton] ButtonManager를 연결 하세요", this);
             return;
         }
-
-        ButtonManager.Instance.ClosePanel(targetPanel);
+        buttonManager.ClosePanel(targetPanel);
     }
 }
