@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 public enum ResultPhase
 {
     Waiting,
@@ -9,7 +6,7 @@ public enum ResultPhase
     WaitingForInput,
     Transitioning
 }
-public class ResultModel : MonoBehaviour
+public class ResultModel
 {
     public ResultPhase CurrentPhase { get; private set; } = ResultPhase.Waiting;
     public bool CanAcceptInput => CurrentPhase == ResultPhase.WaitingForInput;
@@ -31,7 +28,7 @@ public class ResultModel : MonoBehaviour
         ChangePhase(ResultPhase.WaitingForInput);
         return true;
     }
-    public bool TryBeginTransiton()
+    public bool TryBeginTransition()
     {
         if (!CanAcceptInput)
             return false;
