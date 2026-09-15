@@ -3,16 +3,14 @@ using System;
 public sealed class ResultController
 {
     private readonly ResultModel model;
+    private readonly IResultNavigation navigation;
 
     private readonly float resultDelay;
     private readonly float inputDelay;
 
     private float elapsedTime;
 
-    public ResultController(
-        ResultModel model,
-        float resultDelay,
-        float inputDelay)
+    public ResultController(ResultModel model, float resultDelay, float inputDelay, IResultNavigation navigation)
     {
         if (model == null)
         {
@@ -28,11 +26,14 @@ public sealed class ResultController
         {
             throw new ArgumentOutOfRangeException(nameof(inputDelay), "입력 허용 시간은 결과 표시 시간 이상이어야 합니다.");
         }
-
+        if (navigation == null)
+        {
+            throw new ArgumentNullException(nameof(navigation));
+        }
         this.model = model;
         this.resultDelay = resultDelay;
         this.inputDelay = inputDelay;
-
+        this.navigation = navigation;
         elapsedTime = 0f;
     }
 
@@ -59,5 +60,13 @@ public sealed class ResultController
         {
             model.TryEnableInput();
         }
+    }
+
+    public void RequestReturnToTitle()
+    {
+        if (!model.TryBeginTransition())
+            return;
+
+        navigation.ReturnToTitle();
     }
 }
