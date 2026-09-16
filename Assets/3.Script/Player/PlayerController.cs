@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
+using System;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
@@ -52,9 +53,28 @@ public class PlayerController : MonoBehaviour
     private Interact pressedTarget;
     private float pressedTime;
     private bool holdTriggered;
-private InputAction pointerAction;
+    //private InputAction pointerAction;
     // 조준 UI나 유지 진행 표시를 만들 때 사용 가능
-    public Interact CurrentTarget { get; private set; }
+    
+    private Interact currentTarget;
+    public event Action<Interact> TargetChanged;
+
+    public Interact CurrentTarget
+    {
+        get => currentTarget;
+
+        private set
+        {
+            if(ReferenceEquals(currentTarget, value))
+                return;
+
+            currentTarget = value;
+
+            TargetChanged?.Invoke(currentTarget);
+        }
+    }
+    // 입력 판정과 UI에서 같은 유지 시간을 사용
+    public float HoldDuration => Mathf.Max(0.01f, holdDuration);
     public float HoldProgress { get; private set; }
 
     private bool CanControl =>
@@ -76,9 +96,7 @@ private InputAction pointerAction;
 
         inputMap = new InputActionMap("PlayerControls");
 
-        moveAction = inputMap.AddAction(
-            "Move",
-            InputActionType.Value);
+        moveAction = inputMap.AddAction("Move", InputActionType.Value);
 
         moveAction.AddCompositeBinding("2DVector")
             .With("Up", "<Keyboard>/w")
@@ -86,23 +104,12 @@ private InputAction pointerAction;
             .With("Left", "<Keyboard>/a")
             .With("Right", "<Keyboard>/d");
 
-        lookAction = inputMap.AddAction(
-            "Look",
-            InputActionType.Value,
-            "<Mouse>/delta");
-pointerAction = inputMap.AddAction(
-    "Pointer",
-    InputActionType.Value,
-    "<Mouse>/position");
-        clickAction = inputMap.AddAction(
-            "Interact",
-            InputActionType.Button,
-            "<Mouse>/leftButton");
+        lookAction = inputMap.AddAction("Look", InputActionType.Value, "<Mouse>/delta");
+        //pointerAction = inputMap.AddAction("Pointer", InputActionType.Value, "<Mouse>/position");
 
-        returnToCCTVAction = inputMap.AddAction(
-            "ReturnToCCTV",
-            InputActionType.Button,
-            "<Keyboard>/tab");
+        clickAction = inputMap.AddAction("Interact", InputActionType.Button, "<Mouse>/leftButton");
+
+        returnToCCTVAction = inputMap.AddAction("ReturnToCCTV", InputActionType.Button, "<Keyboard>/tab");
 
         if (cameraTarget != null)
         {
@@ -123,10 +130,7 @@ pointerAction = inputMap.AddAction(
             playerCamera == null ||
             cameraTarget == null)
         {
-            Debug.LogError(
-                "[PlayerController] CameraManager, Main Camera, " +
-                "CameraTarget을 연결하세요.",
-                this);
+            Debug.LogError("[PlayerController] CameraManager, Main Camera, CameraTarget을 연결하세요.", this);
 
             enabled = false;
         }
@@ -171,17 +175,24 @@ pointerAction = inputMap.AddAction(
 
     private void LateUpdate()
     {
-        if (!CanControl ||
-        !controlsActive ||
+        if (!CanControl || !controlsActive ||
         Time.frameCount == controlStartFrame ||
         IsPointerOverUI())
-    {
-        CurrentTarget = null;
-        CancelInteraction();
-        return;
-    }
+        {
+            CurrentTarget = null;
+            CancelInteraction();
+            return;
+        }
 
-    UpdateInteraction();
+        UpdateInteraction();
+
+         // 상호작용 실행으로 대상이 비활성화되거나
+    // 해결 불가능 상태가 되면 안내도 숨깁니다.
+        if(CurrentTarget == null || !CurrentTarget.CanInteract)
+        {
+            CurrentTarget = null;
+            CancelInteraction();
+        }
     }
 
     private void SynchronizeControlState(bool canControl)
@@ -198,8 +209,8 @@ pointerAction = inputMap.AddAction(
         {
             controlStartFrame = Time.frameCount;
 
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
         else
         {
@@ -209,15 +220,11 @@ pointerAction = inputMap.AddAction(
 
     private void UpdateMovement(bool canControl)
     {
-        Vector2 input = canControl
-        ? moveAction.ReadValue<Vector2>()
-        : Vector2.zero;
+        Vector2 input = canControl ? moveAction.ReadValue<Vector2>() : Vector2.zero;
 
         input = Vector2.ClampMagnitude(input, 1f);
 
-        Vector3 direction =
-            transform.right * input.x +
-            transform.forward * input.y;
+        Vector3 direction = transform.right * input.x + transform.forward * input.y;
 
         if (characterController.isGrounded && verticalSpeed < 0f)
             verticalSpeed = -2f;
@@ -227,8 +234,7 @@ pointerAction = inputMap.AddAction(
         Vector3 velocity = direction * moveSpeed;
         velocity.y = verticalSpeed;
 
-        CollisionFlags flags = characterController.Move(
-            velocity * Time.deltaTime);
+        CollisionFlags flags = characterController.Move(velocity * Time.deltaTime);
 
         if ((flags & CollisionFlags.Above) != 0 &&
             verticalSpeed > 0f)
@@ -239,33 +245,41 @@ pointerAction = inputMap.AddAction(
 
     private void UpdateLook()
     {
-         if (cameraTarget == null || IsPointerOverUI())
-        return;
+        if (cameraTarget == null || IsPointerOverUI())
+            return;
 
-    Vector2 delta = lookAction.ReadValue<Vector2>();
+        Vector2 delta = lookAction.ReadValue<Vector2>();
 
-    transform.Rotate(
-        Vector3.up,
-        delta.x * mouseSensitivity,
-        Space.Self);
+        transform.Rotate(Vector3.up, delta.x * mouseSensitivity, Space.Self);
 
-    pitch -= delta.y * mouseSensitivity;
-    pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
+        pitch -= delta.y * mouseSensitivity;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
-    cameraTarget.localRotation =
-        Quaternion.Euler(pitch, 0f, 0f);
+        cameraTarget.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
     private void UpdateInteraction()
     {
         CurrentTarget = FindTarget();
 
+        // 새로 누른 순간에만 상호작용을 시작합니다.
         if (clickAction.WasPressedThisFrame())
         {
+            CancelInteraction();
+
+            if (CurrentTarget == null)
+                return;
+
+            // Click 대상은 누르는 순간 한 번 실행합니다.
+            if (CurrentTarget.InputType == InteractionInputType.Click)
+            {
+                CurrentTarget.Click();
+                return;
+            }
+
+            // Hold 대상은 누르기 시작한 대상과 시간을 기억합니다.
             pressedTarget = CurrentTarget;
             pressedTime = Time.time;
-            holdTriggered = false;
-            HoldProgress = 0f;
         }
 
         if (pressedTarget == null)
@@ -274,74 +288,54 @@ pointerAction = inputMap.AddAction(
             return;
         }
 
-        // 시선이 벗어나거나, 거리가 멀어지거나,
-        // 대상이 비활성화되면 취소
-        if (CurrentTarget != pressedTarget ||
-            !pressedTarget.CanInteract)
+        // 거리·시선 이탈, 대상 비활성화, 입력 방식 변경 시 취소합니다.
+        if (CurrentTarget != pressedTarget || !pressedTarget.CanInteract
+            || pressedTarget.InputType != InteractionInputType.Hold)
         {
             CancelInteraction();
             return;
         }
 
-        bool released = clickAction.WasReleasedThisFrame();
-        bool held = clickAction.IsPressed();
-
-        if (!held && !released)
+        // 버튼을 떼면 완료 판정보다 먼저 취소
+        if (clickAction.WasReleasedThisFrame() || !clickAction.IsPressed())
         {
             CancelInteraction();
             return;
         }
+
+        // 계속 누르고 있어도 이미 실행했다면 반복하지 않음
+        if (holdTriggered)
+            return;
 
         float elapsed = Time.time - pressedTime;
-        float duration = Mathf.Max(0.01f, holdDuration);
+        float duration = HoldDuration;
 
         HoldProgress = Mathf.Clamp01(elapsed / duration);
 
-        if (!holdTriggered && elapsed >= duration)
-        {
-            // 이벤트에서 대상이 파괴될 수 있으므로 먼저 기록
-            holdTriggered = true;
-            pressedTarget.Hold();
-        }
-        else if (released && !holdTriggered)
-        {
-            Interact target = pressedTarget;
-
-            CancelInteraction();
-            target.Click();
+        if (elapsed < duration)
             return;
-        }
 
-        if (released)
-            CancelInteraction();
+        // 실행 중 물체가 비활성화될 수 있으므로 먼저 기록
+        holdTriggered = true;
+
+        Interact target = pressedTarget;
+        target.Hold();
     }
-
     private Interact FindTarget()
     {
         if (playerCamera == null)
-        return null;
+            return null;
 
-    Vector2 pointerPosition =
-        pointerAction.ReadValue<Vector2>();
+        // 카메라 화면의 가로 50% 세로 50%에서 정면으로 발사
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
-    Ray ray = playerCamera.ScreenPointToRay(pointerPosition);
+        if (!Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactionRayMask, QueryTriggerInteraction.Ignore))
+        {
+            return null;
+        }
 
-    if (!Physics.Raycast(
-            ray,
-            out RaycastHit hit,
-            interactionDistance,
-            interactionRayMask,
-            QueryTriggerInteraction.Ignore))
-    {
-        return null;
-    }
-
-    Interact target =
-        hit.collider.GetComponentInParent<Interact>();
-
-    return target != null && target.CanInteract
-        ? target
-        : null;
+        Interact tartget = hit.collider.GetComponentInParent<Interact>();
+        return tartget != null && tartget.CanInteract ? tartget : null;
     }
 
     private void CancelInteraction()
