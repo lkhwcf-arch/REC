@@ -102,13 +102,11 @@ public class CameraManager : MonoBehaviour
                 // playerUI 필드를 추가했다면 유지
                 if (playerUI != null)
                     playerUI.SetActive(true);
-                
-                foreach (var cam in CCTVCameras)
-                    cam.enabled = false;
+
                 break;
             case CameraMode.CCTV:
                 // Main Camera는 장면 오브젝트를 그리지 않고 배경만 출력
-                if(playerOutputCamera != null)
+                if (playerOutputCamera != null)
                 {
                     playerOutputCamera.targetTexture = null;
                     playerOutputCamera.rect = new Rect(0f, 0f, 1f, 1f);

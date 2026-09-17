@@ -11,8 +11,7 @@ public class Interact : MonoBehaviour
 {
     [SerializeField] private bool interactionEnabled = true;
     [Header("입력 방식")]
-    [SerializeField]
-    private InteractionInputType inputType = InteractionInputType.Hold;
+    [SerializeField] private InteractionInputType inputType = InteractionInputType.Hold;
     [Header("짧게 클릭했을 때")]
     [SerializeField] private UnityEvent onClick = new UnityEvent();
 
