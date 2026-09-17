@@ -4,7 +4,7 @@ using UnityEngine;
 public sealed class InteractionPromptView : MonoBehaviour
 {
     [Header("입력상태 제공")]
-    [SerializeField] private PlayerController playerController;
+    [SerializeField] private PlayerInteractor playerInteractor;
 
     [Header("화면 연결")]
     [SerializeField] private GameObject content;
@@ -18,7 +18,7 @@ public sealed class InteractionPromptView : MonoBehaviour
 
     private void Awake()
     {
-        if (playerController == null || content == null
+        if (playerInteractor == null || content == null
         || actionText == null || instructionText == null)
         {
             Debug.LogError("[InteractionPromptView] 플레이어와 UI 참조를 연결 할 것", this);
@@ -34,22 +34,22 @@ public sealed class InteractionPromptView : MonoBehaviour
 
     private void OnEnable()
     {
-        if (playerController == null || content == null || actionText == null || instructionText == null)
+        if (playerInteractor == null || content == null || actionText == null || instructionText == null)
         {
             return;
         }
 
-        playerController.TargetChanged += OnTargetChanged;
+        playerInteractor.TargetChanged += OnTargetChanged;
         subscribed = true;
         // UI가 다시 켜졌을 때 현재 상태를 즉시 반영합니다.
-        OnTargetChanged(playerController.CurrentTarget);
+        OnTargetChanged(playerInteractor.CurrentTarget);
     }
 
     private void OnDisable()
     {
-        if (subscribed && playerController != null)
+        if (subscribed && playerInteractor != null)
         {
-            playerController.TargetChanged -= OnTargetChanged;
+            playerInteractor.TargetChanged -= OnTargetChanged;
         }
 
         subscribed = false;
@@ -66,7 +66,7 @@ public sealed class InteractionPromptView : MonoBehaviour
 
         actionText.text = actionLabel;
 
-        string seconds = playerController.HoldDuration.ToString("0.##");
+        string seconds = playerInteractor.HoldDuration.ToString("0.##");
 
         // {0} 부분을 실제 유지 시간으로 바꿉니다.
         instructionText.text = holdInstructionFormat.Replace("{0}", seconds);
