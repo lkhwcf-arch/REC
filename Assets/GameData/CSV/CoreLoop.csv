@@ -1,0 +1,15 @@
+﻿ID,State,StartElapsedMinute,EndElapsedMinute,ScheduleEnabled
+1,RoundStart,0,0,0
+2,LearningPatrol,0,60,0
+3,IntermediateReturn,60,90,0
+4,AnomalyPatrol,90,480,1
+5,FinalReturn,90,480,1
+6,WaitForReview,90,480,1
+7,Review,480,480,0
+8,RoundClear,480,480,0
+9,GameOver,480,480,0
+10,SkipToNextSchedule,90,330,1
+11,FinalSkipChoice,330,480,1
+12,SkipToReview,330,480,0
+최종 복귀 경고,당직 실 복귀 시 해당 회차는 더이상 순찰이 불가능 합니다.,,,
+동일 방 재발생,서로 다른 시간대는 독립 추첨하며 이전 미해결 현상을 동시에 유지합니다. 2026-09-17 사용자 확인.,,,

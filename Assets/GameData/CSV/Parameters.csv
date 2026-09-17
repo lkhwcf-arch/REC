@@ -1,0 +1,4 @@
+﻿ID,DetailIDs,ParameterName,Value,Unit,Description
+9990,,WrongClockMinuteOfDay,90,GameMinuteOfDay,R5 미사용. 시계 시간 변경 제거로 활성 Detail에서 참조하지 않습니다. 기존 값 보존.
+9991,,ClockDisplayStep,30,GameMinute,R5 미사용. 시계 시간 변경 제거로 활성 Detail에서 참조하지 않습니다. 기존 값 보존.
+9992,,WrongClockMinuteOfDay,210,GameMinuteOfDay,R5 미사용. 시계 시간 변경 제거로 활성 Detail에서 참조하지 않습니다. 기존 값 보존.

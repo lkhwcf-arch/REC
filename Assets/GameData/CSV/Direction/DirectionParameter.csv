@@ -1,0 +1,6 @@
+﻿ID,DirectionIDs,ParameterName,Value
+1,3,FadeDuration,1
+2,3,PlayerLockDuration,1
+5,9,DisappearDelay,2
+6,12,DisappearDelay,1
+7,13,DisappearDelay,2

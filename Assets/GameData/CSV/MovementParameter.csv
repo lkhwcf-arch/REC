@@ -1,0 +1,10 @@
+﻿ID,TargetID,MoveType,Axis,Value,Unit
+1,4,Rotation,Y,30,Degree
+2,13,Offset,Y,50,
+3,18,Offset,Y,50,
+4,19,GroupPosition,,,
+5,20,Offset,Y,50,
+6,23,Rotation,Y,90,Degree
+7,26,Offset,Y,50,
+8,25,Offset,Y,-50,
+9,18,Offset,Z,50,
