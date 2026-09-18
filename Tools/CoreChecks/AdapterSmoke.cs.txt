@@ -1,0 +1,52 @@
+using System;
+using REC.Core;
+using UnityEditor;
+using UnityEngine;
+
+public static class AdapterSmoke
+{
+    static int checks;
+    static void Check(bool condition, string message) { checks++; if (!condition) throw new Exception(message); }
+    public static void Run()
+    {
+        try
+        {
+            var root = new GameObject("Target");
+            var visual = GameObject.CreatePrimitive(PrimitiveType.Cube); visual.transform.SetParent(root.transform, false);
+            visual.transform.localPosition = new Vector3(1, 2, 3);
+            var areaObject = new GameObject("Area"); areaObject.transform.SetParent(root.transform, false);
+            var area = areaObject.AddComponent<BoxCollider>(); area.isTrigger = true;
+            var target = root.AddComponent<MapTarget>(); target.Configure(17, visual);
+            var adapter = root.AddComponent<AnomalyTargetAdapter>();
+            var shadow = new GameObject("Shadow"); shadow.transform.SetParent(root.transform, false); shadow.SetActive(false);
+            var member = new GameObject("Member"); member.transform.SetParent(visual.transform, false);
+            var poses = new[] { new AnomalyTargetAdapter.GroupPose { member = member.transform, abnormalLocalPosition = Vector3.one, abnormalLocalEuler = new Vector3(0, 30, 0) } };
+            adapter.Configure(area, shadow, poses);
+            Check(adapter.Supports("ObjectMovement", new MovementSpec(MovementKind.Offset, MovementAxis.Y, .5f), out _), "adapter supports offset");
+            adapter.CaptureBaseline();
+            adapter.Move(new MovementSpec(MovementKind.Offset, MovementAxis.Y, .5f));
+            Check(visual.transform.localPosition == new Vector3(1, 2.5f, 3), "50cm moves 0.5m");
+            adapter.Move(new MovementSpec(MovementKind.Rotation, MovementAxis.Y, 30));
+            Check(Mathf.Abs(Mathf.DeltaAngle(visual.transform.localEulerAngles.y, 30)) < .01f, "rotation");
+            adapter.SetVisible(false); adapter.SetActionable(true);
+            Check(!visual.activeSelf && area.enabled && root.GetComponent<Interact>().CanInteract, "deleted object remains interactable");
+            Check(area.transform.position == visual.transform.position, "interaction area follows moved object");
+            adapter.RestoreBaseline();
+            Check(visual.activeSelf && visual.transform.localPosition == new Vector3(1, 2, 3) && visual.transform.localRotation == Quaternion.identity, "baseline restore");
+            adapter.Move(new MovementSpec(MovementKind.GroupPosition, MovementAxis.X, 0));
+            Check(member.transform.localPosition == Vector3.one, "group movement");
+            adapter.SetShadow(true); Check(shadow.activeSelf, "shadow addition");
+            adapter.RestoreBaseline(); adapter.SetActionable(false);
+            Check(member.transform.localPosition == Vector3.zero && !shadow.activeSelf && !area.enabled, "group shadow interaction reset");
+            visual.SetActive(false); adapter.CaptureBaseline(); adapter.SetVisible(true); adapter.RestoreBaseline();
+            Check(!visual.activeSelf, "addition restores originally absent state");
+            UnityEngine.Object.DestroyImmediate(root);
+            System.IO.File.WriteAllText("adapter-result.txt", "PASS: " + checks + " Unity engine adapter assertions");
+            EditorApplication.Exit(0);
+        }
+        catch (Exception exception)
+        {
+            System.IO.File.WriteAllText("adapter-result.txt", exception.ToString()); Debug.LogException(exception); EditorApplication.Exit(1);
+        }
+    }
+}

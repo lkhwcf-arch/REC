@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public class MapTarget : MonoBehaviour
+public class MapTarget : MonoBehaviour, IAnomalyTarget
 {
     [Header("데이터 연결")]
     [SerializeField, Min(1)] private int targetId = 1;
@@ -9,8 +9,15 @@ public class MapTarget : MonoBehaviour
     [Header("실제 사물")]
     [SerializeField] private GameObject visual;
 
+    public bool IsVisible => visual != null && visual.activeSelf;
     public int TargetId => targetId;
     public GameObject Visual => visual;
+
+    public void Configure(int id, GameObject visualObject)
+    {
+        targetId = id;
+        visual = visualObject;
+    }
 
     public bool TryValidate(out string error)
     {
@@ -34,5 +41,13 @@ public class MapTarget : MonoBehaviour
 
         error = string.Empty;
         return true;
+    }
+
+    public void SetVisible(bool visible)
+    {
+        if (visual == null)
+            throw new System.InvalidOperationException($"TargetID={targetId}의 Visual이 연결되지 않았습니다.");
+
+        visual.SetActive(visible);
     }
 }

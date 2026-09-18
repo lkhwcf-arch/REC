@@ -36,6 +36,7 @@ public sealed class GameDataCatalog : ScriptableObject
             if(string.IsNullOrWhiteSpace(file.text))
             {
                 error = $"CSV 내용이 비어 있습니다: {file.name}";
+                return false;
             }
         }
         error = string.Empty;
