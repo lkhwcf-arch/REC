@@ -110,3 +110,8 @@ InitTestScene*.unity*
 .vscode/settings.json
 .vsconfig
 
+# Reproducible core checks (Unity-generated project files remain ignored).
+!Tools/CoreChecks/CoreChecks.csproj
+/Tools/CoreChecks/bin/
+/Tools/CoreChecks/obj/
+

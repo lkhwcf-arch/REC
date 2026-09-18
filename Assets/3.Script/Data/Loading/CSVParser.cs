@@ -4,8 +4,6 @@ using UnityEngine;
 
 public static class CSVParser
 {
-    // 정규표현식 상수 정의 (클래스 내부 선언)
-    private static readonly string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*[^""]*$)";
     private static readonly char[] TRIM_CHARS = { '\"', ' ', '\t', '\r', '\n' };
     public static List<Dictionary<string, string>> Read(TextAsset data)
     {
