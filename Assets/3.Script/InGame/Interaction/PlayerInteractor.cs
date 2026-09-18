@@ -19,6 +19,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     // 벽과 대상은 포함하고 Player 레이어는 제외
     [SerializeField]
     private LayerMask interactionRayMask = ~0;
+    [SerializeField] private LayerMask interactionAreaMask;
 
     private InputAction clickAction;
 
@@ -153,28 +154,24 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private Interact FindTarget()
     {
-        if (playerCamera == null)
+        if (playerCamera is null)
             return null;
 
-        Ray ray = playerCamera.ViewportPointToRay(
-            new Vector3(0.5f, 0.5f, 0f));
-
-        if (!Physics.Raycast(
-                ray,
-                out RaycastHit hit,
-                interactionDistance,
-                interactionRayMask,
-                QueryTriggerInteraction.Ignore))
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+        float maxDistance = interactionDistance;
+        Interact target = null;
+        // 벽과 실제 사물 중 가장 가까운 충돌 지점을 찾는다.
+        if (Physics.Raycast(ray, out RaycastHit solidHit, maxDistance, interactionRayMask, QueryTriggerInteraction.Ignore))
         {
-            return null;
+            maxDistance = solidHit.distance;
+            target = solidHit.collider.GetComponentInParent<Interact>();
         }
 
-        Interact target =
-            hit.collider.GetComponentInParent<Interact>();
+        // 앞에서 찾은 벽이나 사물보다 가까운 감지 영역만 선택합니다.
+        if (Physics.Raycast(ray, out RaycastHit areaHit, maxDistance, interactionAreaMask, QueryTriggerInteraction.Collide))
+            target = areaHit.collider.GetComponentInParent<Interact>();
 
-        return target != null && target.CanInteract
-            ? target
-            : null;
+        return target != null && target.CanInteract ? target : null;
     }
 
     private void CancelHold()
