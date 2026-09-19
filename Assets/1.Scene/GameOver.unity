@@ -777,7 +777,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b075243ba7d9b724c9d562213f881002, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ResultBootstrapper
-  titleSceneName: Start
+  titleSceneName: Main Menu (Desktop)
   resultView: {fileID: 1832200366}
   resultDelay: 1
   inputDelay: 3

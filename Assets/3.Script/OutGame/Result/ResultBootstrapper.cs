@@ -8,12 +8,10 @@ public sealed class ResultBootstrapper : MonoBehaviour
     private string titleSceneName = "Start";
 
     [Header("화면 연결")]
-    [SerializeField]
-    private ResultView resultView;
+    [SerializeField] private ResultView resultView;
 
     [Header("화면 진입 후 시간")]
-    [SerializeField, Min(0f)]
-    private float resultDelay = 1f;
+    [SerializeField, Min(0f)] private float resultDelay = 1f;
 
     [SerializeField, Min(0f)]
     private float inputDelay = 3f;
