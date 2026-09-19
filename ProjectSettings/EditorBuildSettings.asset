@@ -18,7 +18,7 @@ EditorBuildSettings:
     path: Assets/1.Scene/GameClear.unity
     guid: e51e53512a2abfa4f961b4ee95787158
   - enabled: 1
-    path: Assets/0.Dark - Complete Horror UI/Scenes/Built-in/Main Menu (Desktop).unity
+    path: Assets/1.Scene/Main Menu (Desktop).unity
     guid: de5ae19c8302feb4cb3f2f4cf9a266d9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
