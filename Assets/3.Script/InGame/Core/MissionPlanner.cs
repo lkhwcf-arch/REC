@@ -8,12 +8,11 @@ namespace REC.Core
     {
         private readonly DataManager data;
         private readonly IRandomSource random;
-        private readonly float unspecifiedOffsetScale;
-        public MissionPlanner(DataManager data, IRandomSource random, float unspecifiedOffsetScale = 0)
+
+        public MissionPlanner(DataManager data, IRandomSource random)
         {
             this.data = data ?? throw new ArgumentNullException(nameof(data));
             this.random = random ?? throw new ArgumentNullException(nameof(random));
-            this.unspecifiedOffsetScale = unspecifiedOffsetScale;
         }
         public List<MissionRuntime> Allocate(int roundId, ref long nextOccurrenceId)
         {
@@ -48,7 +47,9 @@ namespace REC.Core
             var detail = data.GetData<DetailData>(anomaly.MainDetailIDs);
             if (detail.AnomalyID != anomaly.ID || detail.Phenomenon != anomaly.BeginMethod || detail.Resolve != anomaly.ResolveMethod)
                 throw new InvalidOperationException($"Anomaly={anomaly.ID}: 상세 소속 또는 행동 이름이 일치하지 않습니다.");
+
             MovementSpec movement = default;
+
             if (anomaly.BeginMethod is "ObjectMovement" or "ObjectGroupMovement")
             {
                 var row = data.GetData<MovementParameterData>(detail.MoveParamID);
@@ -59,8 +60,16 @@ namespace REC.Core
                 {
                     if (!Enum.TryParse(row.Axis, out MovementAxis axis) || !Enum.IsDefined(typeof(MovementAxis), axis) || !row.Value.HasValue || float.IsNaN(row.Value.Value) || float.IsInfinity(row.Value.Value))
                         throw new InvalidOperationException($"이동 설정 {row.ID}의 축/값이 잘못되었습니다.");
-                    float scale = kind == MovementKind.Rotation ? (row.Unit == "Degree" ? 1 : 0) : row.Unit switch { "Meter" => 1, "Centimeter" => 0.01f, "Millimeter" => 0.001f, "" or null => unspecifiedOffsetScale, _ => 0 };
-                    if (scale <= 0 || float.IsNaN(scale) || float.IsInfinity(scale)) throw new InvalidOperationException($"이동 설정 {row.ID}: 단위 '{row.Unit}'를 명시하세요.");
+
+                    string unit = row.Unit?.Trim() ?? "";
+                    
+                    float scale = kind == MovementKind.Rotation
+                        ? (unit == "Degree" ? 1f : 0f)
+                        : unit switch { "" or "Centimeter" => 0.01f, "Meter" => 1f, "Millimeter" => 0.001f, _ => 0f };
+
+                    if (scale <= 0) 
+                        throw new InvalidOperationException($"이동 설정 {row.ID}: 지원하지 않는 단위 '{row.Unit}'입니다.");
+                    
                     movement = new MovementSpec(kind, axis, row.Value.Value * scale);
                 }
             }

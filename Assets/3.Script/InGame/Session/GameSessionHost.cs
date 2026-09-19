@@ -19,8 +19,7 @@ public class GameSessionHost : MonoBehaviour
     [SerializeField, Min(1)] private int intermediateReturnMinute = 60;
     [SerializeField, Min(1)] private int firstObservationMinute = 90;
     [SerializeField, Min(1)] private int roundDurationMinutes = 480;
-    [Tooltip("Unit이 비어 있는 Offset의 1을 몇 m로 볼지 명시합니다. 0이면 설정 오류로 중단합니다.")]
-    [SerializeField, Min(0)] private float unspecifiedOffsetMeters;
+
     [Header("연출 연결: 사건 종류 / DirectionGroupID / TargetID")]
     [SerializeField] private SessionCueEvent onPresentationCue = new();
     [SerializeField] private UnityEvent onRoundReset = new();
@@ -30,14 +29,23 @@ public class GameSessionHost : MonoBehaviour
     private bool initialized;
     public GameSession Session { get; private set; }
     public event Action<SessionEvent> Changed;
-    public void Configure(GameDataBootstrapper data, AnomalyTargetAdapter[] bindings, float offsetMeters, RoundResetScope scope = null, int firstRound = 1, int seed = 1709)
-    { dataBootstrapper = data; targets = bindings; unspecifiedOffsetMeters = offsetMeters; resetScope = scope; firstRoundId = firstRound; randomSeed = seed; }
+    public void Configure(GameDataBootstrapper data, AnomalyTargetAdapter[] bindings, RoundResetScope scope = null, int firstRound = 1, int seed = 1709)
+    {
+        dataBootstrapper = data; targets = bindings; resetScope = scope; firstRoundId = firstRound; randomSeed = seed;
+    }
     private void Start() => Initialize();
     public void Initialize()
     {
         if (initialized) return;
+
         initialized = true;
-        if (dataBootstrapper == null || !dataBootstrapper.IsLoaded) { Debug.LogError("[회차 초기화] 데이터 로드를 먼저 완료하세요.", this); enabled = false; return; }
+
+        if (dataBootstrapper == null || !dataBootstrapper.IsLoaded)
+        {
+            Debug.LogError("[회차 초기화] 데이터 로드를 먼저 완료하세요.", this); enabled = false;
+            return;
+        }
+
         Dictionary<int, IAnomalyBody> bodies = new();
         foreach (var target in targets)
         {
@@ -47,7 +55,7 @@ public class GameSessionHost : MonoBehaviour
         {
             if (resetScope != null) resetScope.Capture();
             var rules = new SessionRules(millisecondsPerMinute, startMinute, intermediateReturnMinute, firstObservationMinute, roundDurationMinutes);
-            var planner = new MissionPlanner(dataBootstrapper.Data, new SeededRandom(randomSeed), unspecifiedOffsetMeters);
+            var planner = new MissionPlanner(dataBootstrapper.Data, new SeededRandom(randomSeed));
             Session = new GameSession(dataBootstrapper.Data, planner, new AnomalyRuntime(bodies, new AnomalyActionRegistry()), rules);
             Session.Changed += OnChanged;
             foreach (var target in targets) target.Bind(Session);
