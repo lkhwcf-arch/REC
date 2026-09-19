@@ -82,7 +82,8 @@ public class CoreLoopTestScene : MonoBehaviour
             adapter.Configure(area, shadowObject, poses); bindings.Add(adapter);
         }
         var reset = gameObject.AddComponent<RoundResetScope>(); reset.Configure(transform);
-        host = gameObject.AddComponent<GameSessionHost>(); host.Configure(dataBootstrapper, bindings.ToArray(), 0, reset, firstRoundId, randomSeed);
+        host = gameObject.AddComponent<GameSessionHost>();
+        host.Configure(dataBootstrapper, bindings.ToArray(), reset, firstRoundId, randomSeed);
         var playerObject = new GameObject("Test Player"); playerObject.transform.SetParent(transform);
         player = playerObject.AddComponent<CoreLoopTestPlayer>();
         player.Configure(host, highlightMaterial, outlineOpacity, ghostOpacity, outlineWidth);

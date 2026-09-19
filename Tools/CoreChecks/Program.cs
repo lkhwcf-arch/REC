@@ -23,7 +23,7 @@ class Program
     static Dictionary<int, IAnomalyBody> Bodies(DataManager data) => data.GetAllData<TargetCodeData>().ToDictionary(t => t.ID, t => (IAnomalyBody)new Body(t.ID));
     static GameSession Session(DataManager data, int seed, Dictionary<int, IAnomalyBody> bodies = null)
     {
-        return new GameSession(data, new MissionPlanner(data, new SeededRandom(seed), 0.01f), new AnomalyRuntime(bodies ?? Bodies(data), new ActionCatalog()), new SessionRules());
+        return new GameSession(data, new MissionPlanner(data, new SeededRandom(seed)), new AnomalyRuntime(bodies ?? Bodies(data), new ActionCatalog()), new SessionRules());
     }
     static void Main()
     {
@@ -80,24 +80,41 @@ class Program
         var sourceA = new MissionPlanner(data, new SeededRandom(42), 0.01f); var sourceB = new MissionPlanner(data, new SeededRandom(42), 0.01f);
         long idA = 0, idB = 0;
         Assert(sourceA.Allocate(1, ref idA).Select(m => m.QuestId).SequenceEqual(sourceB.Allocate(1, ref idB).Select(m => m.QuestId)), "주입 난수 시드 재현");
-        bool unitError = false;
-        var untypedMovement = data.GetData<MovementParameterData>(2); string savedUnit = untypedMovement.Unit; untypedMovement.Unit = "";
-        try { new MissionPlanner(data, new SeededRandom(1)).Create(data.GetData<QuestData>(3), 1); } catch (InvalidOperationException) { unitError = true; }
-        untypedMovement.Unit = savedUnit;
-        Assert(unitError, "명시하지 않은 이동 단위 거부");
+
+        var planner = new MissionPlanner(data, new SeededRandom(1));
+        var movementRow = data.GetData<MovementParameterData>(2);
+        string savedUnit = movementRow.Unit;
+        try
+        {
+            movementRow.Unit = "";
+            planner.Create(data.GetData<QuestData>(3), 1);
+            movementRow.Unit = "Unsupported";
+            bool rejected = false;
+            try { planner.Create(data.GetData<QuestData>(3), 2); }
+            catch (InvalidOperationException) { rejected = true; }
+            Assert(rejected, "지원하지 않는 이동 단위 거부");
+        }
+        finally { movementRow.Unit = savedUnit; }
+
         var bodies = Bodies(data); var runtime = new AnomalyRuntime(bodies, new ActionCatalog()); runtime.Capture();
         var move = sourceA.Create(data.GetData<QuestData>(25), 10001); // Target 17, Y 이동
         var deletion = sourceA.Create(data.GetData<QuestData>(12), 10002); // 같은 Target 17 소실
+        
         runtime.Activate(move); runtime.Activate(deletion);
         Body body = (Body)bodies[17]; Assert(!body.Visible && Math.Abs(body.Offset - 0.5f) < 0.001f, "같은 사물 복합 사건");
         runtime.Resolve(move); Assert(!body.Visible && body.Offset == 0 && body.Actionable, "이동 해결 후 소실 유지");
         runtime.Resolve(deletion); Assert(body.Visible && !body.Actionable, "마지막 사건 해결 후 정상화");
         runtime.Reset(); Assert(bodies.Values.Cast<Body>().All(b => b.Visible && b.Offset == 0 && !b.Actionable), "맵 전체 기준 상태 초기화");
+        
         var reverseBodies = Bodies(data); var reverseRuntime = new AnomalyRuntime(reverseBodies, new ActionCatalog()); reverseRuntime.Capture();
         var repeatedA = sourceA.Create(data.GetData<QuestData>(12), 10003); var repeatedB = sourceA.Create(data.GetData<QuestData>(12), 10004);
+        
         reverseRuntime.Activate(repeatedA); reverseRuntime.Activate(repeatedB); reverseRuntime.Resolve(repeatedA);
+        
         Assert(!((Body)reverseBodies[17]).Visible && ((Body)reverseBodies[17]).Actionable, "같은 소실이 중첩되어도 한 사건만 해결");
+        
         reverseRuntime.Resolve(repeatedB); Assert(((Body)reverseBodies[17]).Visible, "같은 소실의 마지막 사건 정상화");
+        
         Console.WriteLine($"PASS: {checks} assertions (100 seeds × 4 rounds, real CSV, overlap, deadlines, unit validation)");
     }
     class Body : IAnomalyBody
