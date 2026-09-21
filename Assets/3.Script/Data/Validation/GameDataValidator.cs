@@ -19,6 +19,13 @@ public static class GameDataValidator
         ValidateRounds(data, errors);
         ValidateScheduleRules(data, errors);
         ValidateRoundRules(data, errors);
+        HashSet<string> doors = new(StringComparer.Ordinal);
+        foreach (var door in data.GetAllData<DoorData>())
+        {
+            if (string.IsNullOrWhiteSpace(door.SceneBinding) || !doors.Add(door.SceneBinding)) errors.Add($"Door={door.ID}: 문 경로가 비었거나 중복됩니다.");
+            if (string.IsNullOrWhiteSpace(door.InteriorBinding)) errors.Add($"Door={door.ID}: 실내 방향 기준 경로가 필요합니다.");
+            if (door.HingeSide is not (-1 or 1) || !(door.OpenAngle > 0 && door.OpenAngle <= 120) || !(door.AngularSpeed > 0 && door.AngularSpeed <= 720)) errors.Add($"Door={door.ID}: 경첩 방향/열림 각도/속도 범위가 잘못되었습니다.");
+        }
 
         return errors;
     }
@@ -62,6 +69,8 @@ public static class GameDataValidator
     {
         foreach (QuestData quest in data.GetAllData<QuestData>())
         {
+            if (quest.Enabled is not (0 or 1)) errors.Add($"Quest={quest.ID}: Enabled는 0 또는 1이어야 합니다.");
+            if (quest.Enabled == 0 && string.IsNullOrWhiteSpace(quest.DisabledReason)) errors.Add($"Quest={quest.ID}: 비활성화 사유가 필요합니다.");
             Require<RoundData>(data, quest.RoundID, $"Quest ID={quest.ID}, RoundID", errors);
             Require<AnomalyData>(data, quest.AnomalyID, $"Quest ID={quest.ID}, AnomalyID", errors);
 
@@ -98,12 +107,18 @@ public static class GameDataValidator
 
     private static void ValidateScheduleRules(DataManager data, List<string> errors)
     {
-        var questsBySchedule = data.GetAllData<QuestData>().ToLookup(quest => quest.ScheduleID);
+        var questsBySchedule = data.GetAllData<QuestData>().Where(q => q.Enabled == 1).ToLookup(quest => quest.ScheduleID);
 
         foreach (ScheduleData schedule in data.GetAllData<ScheduleData>())
         {
             QuestData[] candidates = questsBySchedule[schedule.ID].ToArray();
             string source = $"[Schedule ID={schedule.ID}]";
+            if (schedule.Enabled is not (0 or 1)) errors.Add($"{source} Enabled는 0 또는 1이어야 합니다.");
+            if (schedule.Enabled == 0)
+            {
+                if (candidates.Length != 0 || schedule.DrawCount != 0 || schedule.CandidateCount != 0 || schedule.WeightSum != 0) errors.Add($"{source} 비활성 일정은 활성 후보와 추첨 수가 0이어야 합니다.");
+                continue;
+            }
 
             if (schedule.SlotOrder <= 0)
                 errors.Add($"{source} SlotOrder는 1 이상이어야 합니다.");
@@ -157,8 +172,8 @@ public static class GameDataValidator
     }
     private static void ValidateRoundRules(DataManager data, List<string> errors)
     {
-        var schedulesByRound = data.GetAllData<ScheduleData>().ToLookup(schedule => schedule.RoundID);
-        var questsBySchedule = data.GetAllData<QuestData>().ToLookup(quest => quest.ScheduleID);
+        var schedulesByRound = data.GetAllData<ScheduleData>().Where(s => s.Enabled == 1).ToLookup(schedule => schedule.RoundID);
+        var questsBySchedule = data.GetAllData<QuestData>().Where(q => q.Enabled == 1).ToLookup(quest => quest.ScheduleID);
 
         foreach (RoundData round in data.GetAllData<RoundData>())
         {

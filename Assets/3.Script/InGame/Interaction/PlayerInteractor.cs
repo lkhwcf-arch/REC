@@ -28,6 +28,9 @@ public sealed class PlayerInteractor : MonoBehaviour
     private float pressedTime;
     private bool holdTriggered;
     private int enabledFrame;
+    private readonly RaycastHit[] areaHits = new RaycastHit[64];
+    public void Configure(PlayerController controller, Camera camera, int solidMask, int areaMask)
+    { playerController = controller; playerCamera = camera; interactionRayMask = solidMask; interactionAreaMask = areaMask; }
 
     public event Action<Interact> TargetChanged;
 
@@ -164,14 +167,30 @@ public sealed class PlayerInteractor : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit solidHit, maxDistance, interactionRayMask, QueryTriggerInteraction.Ignore))
         {
             maxDistance = solidHit.distance;
-            target = solidHit.collider.GetComponentInParent<Interact>();
+            target = FindEnabledInteraction(solidHit.collider.transform);
         }
 
         // 앞에서 찾은 벽이나 사물보다 가까운 감지 영역만 선택합니다.
-        if (Physics.Raycast(ray, out RaycastHit areaHit, maxDistance, interactionAreaMask, QueryTriggerInteraction.Collide))
-            target = areaHit.collider.GetComponentInParent<Interact>();
+        int count = Physics.RaycastNonAlloc(ray, areaHits, maxDistance + 0.01f, interactionAreaMask, QueryTriggerInteraction.Collide);
+        if (count == areaHits.Length) return null;
+        float nearest = maxDistance + 0.01f;
+        for (int i = 0; i < count; i++)
+        {
+            Interact candidate = FindEnabledInteraction(areaHits[i].collider.transform);
+            if (candidate == null || areaHits[i].distance > nearest) continue;
+            nearest = areaHits[i].distance; target = candidate;
+        }
 
         return target != null && target.CanInteract ? target : null;
+    }
+    private static Interact FindEnabledInteraction(Transform node)
+    {
+        while (node != null)
+        {
+            if (node.TryGetComponent(out Interact interaction) && interaction.CanInteract) return interaction;
+            node = node.parent;
+        }
+        return null;
     }
 
     private void CancelHold()

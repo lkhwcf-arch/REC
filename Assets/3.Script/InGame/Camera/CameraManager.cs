@@ -54,6 +54,14 @@ public class CameraManager : MonoBehaviour
     public bool IsPlayerView => initialized && CurrentMode == CameraMode.Player;
     // 입력 제어 등 다른 시스템에 카메라 상태 변경을 알림
     public event Action<CameraMode> ModeChanged;
+    // 통합 씬에서는 UI/단말기 등의 우회 호출도 같은 회차 규칙을 확인합니다.
+    public Func<CameraMode, bool> ModeAllowed { private get; set; }
+    public void ConfigureCctvPose(int index, Vector3 position, Vector3 lookAt)
+    {
+        if (CCTVCameras == null || index < 0 || index >= CCTVCameras.Length || CCTVCameras[index] == null) throw new ArgumentException("CCTV 카메라 연결을 확인하세요.");
+        Camera camera = CCTVCameras[index]; camera.transform.SetPositionAndRotation(position, Quaternion.LookRotation(lookAt - position));
+        camera.nearClipPlane = 0.03f; camera.fieldOfView = 80;
+    }
     private void Start()
     {
         // 다른 시스템이 먼저 모드를 설정했다면 덮어쓰지 않음
@@ -73,6 +81,7 @@ public class CameraManager : MonoBehaviour
 
     private void SetMode(CameraMode nextMode)
     {
+        if (ModeAllowed != null && !ModeAllowed(nextMode)) return;
         if (initialized && CurrentMode == nextMode) return;
 
         // 잘못된 설정으로 현재 화면까지 꺼지는 것을 방지

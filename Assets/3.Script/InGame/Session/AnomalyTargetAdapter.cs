@@ -23,6 +23,9 @@ public class AnomalyTargetAdapter : MonoBehaviour, IAnomalyBody
     public int TargetId => Target.TargetId;
     public MapTarget Target => target != null ? target : target = GetComponent<MapTarget>();
     public bool Actionable { get; private set; }
+    private int[] targetIds;
+    public int[] TargetIds => targetIds ??= new[] { TargetId };
+    public void ConfigureAliases(int[] ids) => targetIds = ids;
     private struct Snapshot
     {
         public Transform transform;
@@ -56,7 +59,10 @@ public class AnomalyTargetAdapter : MonoBehaviour, IAnomalyBody
     }
     private void RequestResolve()
     {
-        if (session != null) session.RequestResolve(session.GetActiveOccurrence(TargetId));
+        if (session == null) return;
+        long oldest = long.MaxValue;
+        foreach (int id in TargetIds) { long occurrence = session.GetActiveOccurrence(id); if (occurrence > 0 && occurrence < oldest) oldest = occurrence; }
+        if (oldest != long.MaxValue) session.RequestResolve(oldest);
     }
     public bool Supports(string action, MovementSpec movement, out string error)
     {

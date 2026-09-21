@@ -12,7 +12,7 @@ class Program
     {
         var data = new DataManager();
         Add<AnomalyData>(data, "Anomaly"); Add<DetailData>(data, "Detail"); Add<MovementParameterData>(data, "MovementParameter");
-        Add<TargetCodeData>(data, "TargetCodes"); Add<QuestData>(data, "Quest"); Add<ScheduleData>(data, "Schedule"); Add<RoundData>(data, "Round");
+        Add<TargetCodeData>(data, "TargetCodes"); Add<QuestData>(data, "Quest"); Add<ScheduleData>(data, "Schedule"); Add<RoundData>(data, "Round"); Add<DoorData>(data, "Door");
         var errors = GameDataValidator.Validate(data); Assert(errors.Count == 0, string.Join("\n", errors)); data.Seal(); return data;
     }
     static void Add<T>(DataManager data, string name) where T : class, ICSVData, new()
@@ -37,7 +37,9 @@ class Program
             for (int round = 1; round <= 4; round++)
             {
                 Assert(session.RoundId == round && session.ElapsedMs == 0, "회차 시작 초기화");
-                Assert(session.Missions.Count == 3 && session.Missions.All(m => m.Status == MissionStatus.Locked), "선배정/잠금");
+                int expected = data.GetAllData<ScheduleData>().Where(s => s.Enabled == 1 && s.RoundID == round).Sum(s => s.DrawCount);
+                Assert(session.Missions.Count == expected && session.Missions.All(m => m.Status == MissionStatus.Locked), "선배정/잠금");
+                Assert(session.Missions.All(m => data.GetData<QuestData>(m.QuestId).Enabled == 1), "비활성 미션 배정 금지");
                 foreach (var mission in session.Missions) Assert(ids.Add(mission.OccurrenceId), "회차 간 사건 ID 유일");
                 Assert(!session.RequestResolve(session.Missions[0].OccurrenceId), "오픈 전 해결 금지");
                 Assert(session.RequestEnterRoom(), "중간 복귀");
@@ -48,7 +50,7 @@ class Program
                 Assert(!session.RequestEnterRoom() && !session.CanEnterRoom, "순찰 중 복귀 금지");
                 Assert(session.RequestSkip(), "두 번째 일정");
                 Assert(session.Missions.Count(m => m.Status == MissionStatus.Active) == 2, "이전 미해결 유지");
-                Assert(session.RequestSkip(), "세 번째 일정");
+                if (expected > 2) Assert(session.RequestSkip(), "세 번째 일정");
                 foreach (var mission in session.Missions)
                 {
                     Assert(session.RequestResolve(mission.OccurrenceId), "해결 명령");
@@ -77,7 +79,7 @@ class Program
         Assert(completeLate.Phase == SessionPhase.AwaitFinalReturn && completeLate.RequestEnterRoom(), "마감 전 전부 해결했다면 추가 복귀 실패 조건 없음");
         var missing = Session(data, 1, new Dictionary<int, IAnomalyBody>());
         Assert(!missing.Start(1) && missing.Phase == SessionPhase.ConfigurationError, "미완성 사물 연결은 설정 오류");
-        var sourceA = new MissionPlanner(data, new SeededRandom(42), 0.01f); var sourceB = new MissionPlanner(data, new SeededRandom(42), 0.01f);
+        var sourceA = new MissionPlanner(data, new SeededRandom(42)); var sourceB = new MissionPlanner(data, new SeededRandom(42));
         long idA = 0, idB = 0;
         Assert(sourceA.Allocate(1, ref idA).Select(m => m.QuestId).SequenceEqual(sourceB.Allocate(1, ref idB).Select(m => m.QuestId)), "주입 난수 시드 재현");
 
@@ -87,7 +89,7 @@ class Program
         try
         {
             movementRow.Unit = "";
-            planner.Create(data.GetData<QuestData>(3), 1);
+            Assert(Math.Abs(planner.Create(data.GetData<QuestData>(3), 1).Movement.Value - 0.5f) < 0.0001f, "빈 단위의 50cm를 0.5m로 변환");
             movementRow.Unit = "Unsupported";
             bool rejected = false;
             try { planner.Create(data.GetData<QuestData>(3), 2); }
@@ -97,7 +99,7 @@ class Program
         finally { movementRow.Unit = savedUnit; }
 
         var bodies = Bodies(data); var runtime = new AnomalyRuntime(bodies, new ActionCatalog()); runtime.Capture();
-        var move = sourceA.Create(data.GetData<QuestData>(25), 10001); // Target 17, Y 이동
+        var move = sourceA.Create(data.GetData<QuestData>(24), 10001); // Target 17, Y 이동
         var deletion = sourceA.Create(data.GetData<QuestData>(12), 10002); // 같은 Target 17 소실
         
         runtime.Activate(move); runtime.Activate(deletion);

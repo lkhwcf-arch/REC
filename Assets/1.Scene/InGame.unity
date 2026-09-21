@@ -518,7 +518,7 @@ MonoBehaviour:
   Lens:
     FieldOfView: 60.000004
     OrthographicSize: 5
-    NearClipPlane: 0.3
+    NearClipPlane: 0.03
     FarClipPlane: 1000
     Dutch: 0
     ModeOverride: 0
@@ -1687,7 +1687,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 463671b8cf7513144b263246de121ff1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
-  initialMode: 2
+  initialMode: 1
   titleCamera: {fileID: 0}
   playerOutputCamera: {fileID: 330585545}
   playerBrain: {fileID: 330585548}
@@ -1700,7 +1700,7 @@ MonoBehaviour:
   CCTVScreenPannel: {fileID: 20780370}
   gameoverCamera: {fileID: 0}
   gameclearCamera: {fileID: 0}
-  playerUI: {fileID: 735222006}
+  playerUI: {fileID: 0}
 --- !u!4 &691565389
 Transform:
   m_ObjectHideFlags: 0
@@ -1734,7 +1734,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &707359643
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1867,7 +1867,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &735222007
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2784,7 +2784,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1646034745
 Transform:
   m_ObjectHideFlags: 0
@@ -2849,7 +2849,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1676508675
 Transform:
   m_ObjectHideFlags: 0
@@ -3277,7 +3277,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2033606574
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3886,6 +3886,82 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e73ab48290dc01d479c49edaafc67ba7, type: 3}
+--- !u!1 &900100001
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 900100002}
+  - component: {fileID: 900100003}
+  m_Layer: 0
+  m_Name: InGameCore
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &900100002
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900100001}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &900100003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900100001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f26ce7c87aa43f996cb0c0e5dc95df0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InGameSceneBootstrapper
+  dataBootstrapper: {fileID: 1100777710}
+  mapRoot: {fileID: 1540734332}
+  player: {fileID: 1312097968}
+  interactor: {fileID: 1312097970}
+  outputCamera: {fileID: 330585545}
+  cameras: {fileID: 691565388}
+  highlightMaterial: {fileID: 2100000, guid: 66924b64d8e96454ba01b7db9a92a433, type: 2}
+  legacyTestObjects:
+  - {fileID: 202989423}
+  - {fileID: 1646034744}
+  - {fileID: 2033606573}
+  - {fileID: 735222006}
+  - {fileID: 1676508674}
+  - {fileID: 707359642}
+  controlRoomFloorName: DutyRoom_FloorFinish
+  controlRoomDoorName: DutyRoom_Door_ASSEMBLY
+  outlineOpacity: 0.9
+  ghostOpacity: 0.15
+  outlineWidth: 0.035
+  cctvPoses:
+  - index: 0
+    position: {x: 2.8, y: 2.8, z: -5.6}
+    lookAt: {x: 0, y: 1.0, z: 1}
+  - index: 1
+    position: {x: -1.3, y: 2.8, z: -12}
+    lookAt: {x: 1.2, y: 1.0, z: -9.3}
+  - index: 2
+    position: {x: 9.4, y: 2.8, z: -12}
+    lookAt: {x: 5.8, y: 1.0, z: -8.8}
+  - index: 3
+    position: {x: -11.3, y: 10.5, z: -10}
+    lookAt: {x: -17, y: 8.3, z: -17}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -3905,3 +3981,4 @@ SceneRoots:
   - {fileID: 2033606575}
   - {fileID: 1646034745}
   - {fileID: 735222007}
+  - {fileID: 900100002}

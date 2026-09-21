@@ -1,5 +1,5 @@
-﻿ID,NextRoundID,StartTime,ReviewTime,ScheduleCount,FixedCount,RandomCount
+ID,NextRoundID,StartTime,ReviewTime,ScheduleCount,FixedCount,RandomCount
 1,2,Sun Dec 31 1899 14:27:52 GMT+0827 (한국 표준시),Sat Dec 30 1899 22:27:52 GMT+0827 (한국 표준시),3,1,2
 2,3,Sun Dec 31 1899 14:27:52 GMT+0827 (한국 표준시),Sat Dec 30 1899 22:27:52 GMT+0827 (한국 표준시),3,1,2
 3,4,Sun Dec 31 1899 14:27:52 GMT+0827 (한국 표준시),Sat Dec 30 1899 22:27:52 GMT+0827 (한국 표준시),3,1,2
-4,0,Sun Dec 31 1899 14:27:52 GMT+0827 (한국 표준시),Sat Dec 30 1899 22:27:52 GMT+0827 (한국 표준시),3,1,2
+4,0,Sun Dec 31 1899 14:27:52 GMT+0827 (한국 표준시),Sat Dec 30 1899 22:27:52 GMT+0827 (한국 표준시),2,0,2
