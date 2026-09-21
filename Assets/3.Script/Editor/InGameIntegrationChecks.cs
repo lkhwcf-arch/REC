@@ -49,7 +49,11 @@ public static class InGameIntegrationChecks
             for (int round = 1; round <= 4; round++)
             {
                 Check(session.RoundId == round, $"{round}회차 시작");
-                Check(session.RequestEnterRoom(), "중간 복귀");
+                session.Tick(75000); // 22:30 복귀와 23:30 관측 조건을 구분합니다.
+                Check(session.RequestEnterRoom(), "22:30 중간 복귀");
+                var screen = (GameObject)new SerializedObject(cameraManager).FindProperty("CCTVScreenPannel").objectReferenceValue;
+                Check(cameraManager.CurrentMode == CameraMode.CCTV && screen != null && screen.activeInHierarchy, "부모 Canvas를 포함한 CCTV 화면 활성화");
+                Check(!session.RequestObserveCctv(), "22:30 CCTV 확인은 아직 불가");
                 Check(!session.RequestLeaveRoom(), "CCTV 확인 전 순찰 차단");
                 Check(session.RequestSkip() && session.RequestObserveCctv() && session.RequestLeaveRoom(), "23:30 확인 후 순찰");
                 Check(!session.RequestEnterRoom(), "미해결 중 복귀 차단");
