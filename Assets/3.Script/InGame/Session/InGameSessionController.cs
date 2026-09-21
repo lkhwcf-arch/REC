@@ -22,6 +22,9 @@ public class InGameSessionController : MonoBehaviour
     public event Action ViewChanged;
     public event Action<string> ResultRequested;
     public bool NearEntrance => player != null && Vector3.Distance(player.transform.position, entrance) < 2.8f;
+
+    private PlayerInteractor interactor;
+    private PresentationDirector presentation;
     public bool Observed => observed;
     public void Configure(GameSessionHost owner, PlayerController controller, CameraManager manager, Bounds roomBounds, Bounds doorBounds, Transform door, Transform map)
     {
@@ -32,6 +35,8 @@ public class InGameSessionController : MonoBehaviour
         spawnRotation = Quaternion.LookRotation(outward, Vector3.up); lastOutside = spawn;
         host.Changed += OnChanged; player.ReturnRequested += RequestReturn;
         cameras.ModeAllowed = mode => host.Session != null && (mode == CameraMode.Player ? host.Session.CanPatrol : mode == CameraMode.CCTV && host.Session.Phase is SessionPhase.ControlRoom or SessionPhase.RoundComplete);
+        interactor = player.GetComponent<PlayerInteractor>();
+        presentation = GetComponent<PresentationDirector>();
     }
     private void Update()
     {
@@ -41,7 +46,11 @@ public class InGameSessionController : MonoBehaviour
         if (!paused && keyboard != null && keyboard.nKey.wasPressedThisFrame) RequestSkip();
         var session = host.Session;
         player.SetSessionControl(!paused && session.CanPatrol && !session.IsTerminal);
-        if (!session.CanPatrol || paused) { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+        if (!session.CanPatrol || paused)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
         // UI뿐 아니라 실제 CCTV실 진입도 제한합니다. 별도 사물 상호작용은 추가하지 않습니다.
         Vector3 position = player.transform.position;
         bool inside = position.x > room.min.x && position.x < room.max.x && position.z > room.min.z && position.z < room.max.z && Mathf.Abs(position.y - room.max.y) < 2;
@@ -72,10 +81,23 @@ public class InGameSessionController : MonoBehaviour
     public void RequestNextRound() => host.Session?.RequestNextRound();
     public void SetPaused(bool value)
     {
-        if (paused == value) return;
+        if (paused == value)
+            return;
+
         paused = value;
-        if (paused) { previousTimeScale = Time.timeScale; Time.timeScale = 0; }
-        else Time.timeScale = previousTimeScale;
+
+        if (paused)
+        {
+            interactor?.CancelCurrentInteraction();
+            previousTimeScale = Time.timeScale;
+            Time.timeScale = 0;
+        }
+        else
+        {
+            Time.timeScale = previousTimeScale;
+        }
+
+        presentation?.SetSuspended(Time.timeScale <= 0f || !Application.isFocused);
         ViewChanged?.Invoke();
     }
     private void OnChanged(SessionEvent message)
@@ -84,15 +106,44 @@ public class InGameSessionController : MonoBehaviour
         if (message.Kind == "RoundStarted")
         {
             observed = false; player.Teleport(spawn, spawnRotation); lastOutside = spawn; cameras.ShowPlayer();
-            SetNotice("23:00까지 CCTV실로 복귀하세요. 문 앞에서 Tab을 누릅니다.");
+            SetNotice("초기 순찰을 진행하세요. 23:00에는 CCTV실로 자동 복귀합니다.");
         }
-        if (message.Kind == "IntermediateReturned") { player.Teleport(roomPosition, spawnRotation); cameras.ShowCCTV(); SetNotice("23:30에 CCTV를 확인하고 순찰을 시작하세요."); }
-        if (message.Kind == "CctvObserved") { observed = true; SetNotice("CCTV 확인 완료. 현장 순찰을 시작할 수 있습니다."); }
-        if (message.Kind == "PatrolStarted") { player.Teleport(spawn, spawnRotation); cameras.ShowPlayer(); SetNotice("이상현상을 찾아 마우스 왼쪽 버튼을 1초간 눌러 해결하세요."); }
-        if (message.Kind == "AllMissionsResolved") SetNotice("미션을 모두 해결했습니다. CCTV실로 최종 복귀하세요.");
-        if (message.Kind == "RoundCompleted") { cameras.ShowCCTV(); SetNotice("회차 완료. 다음 회차를 시작하면 맵이 초기화됩니다."); }
-        if (roomDoor != null) roomDoor.gameObject.SetActive(session.Phase != SessionPhase.ControlRoom);
+        if (message.Kind is "IntermediateReturned" or "ForcedReturned")
+        {
+            interactor?.CancelCurrentInteraction();
+            player.SetSessionControl(false);
+            player.Teleport(roomPosition, spawnRotation);
+            cameras.ShowCCTV();
+
+            SetNotice(message.Kind == "ForcedReturned"
+                ? "23:00이 되어 CCTV실로 복귀했습니다. 23:30에 CCTV를 확인하세요."
+                : "23:30에 CCTV를 확인하고 순찰을 시작하세요.");
+        }
+        if (message.Kind == "CctvObserved")
+        {
+            observed = true; SetNotice("CCTV 확인 완료. 현장 순찰을 시작할 수 있습니다.");
+        }
+        if (message.Kind == "PatrolStarted")
+        {
+            player.Teleport(spawn, spawnRotation);
+            cameras.ShowPlayer(); SetNotice("이상현상을 찾아 마우스 왼쪽 버튼을 길게 눌러 해결하세요.");
+        }
+        if (message.Kind == "AllMissionsResolved")
+            SetNotice("미션을 모두 해결했습니다. CCTV실로 최종 복귀하세요.");
+        if (message.Kind == "RoundCompleted")
+        {
+            cameras.ShowCCTV();
+            SetNotice("회차 완료. 다음 회차를 시작하면 맵이 초기화됩니다.");
+        }
+        if (roomDoor != null)
+            roomDoor.gameObject.SetActive(session.Phase != SessionPhase.ControlRoom);
         player.SetSessionControl(session.CanPatrol && !paused);
+
+        if (message.Kind is "RoundStarted" or "GameOver" or "GameClear" or "ConfigurationError")
+            interactor?.CancelCurrentInteraction();
+
+        presentation?.Handle(message);
+
         if (message.Kind is "GameOver" or "GameClear")
         {
             changingScene = true; if (paused) SetPaused(false);

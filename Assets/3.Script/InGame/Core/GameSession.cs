@@ -15,6 +15,7 @@ namespace REC.Core
         private long nextOccurrenceId;
         private int nextOpening;
         private bool observed, intermediateReturned, started;
+        private bool firstObservationNotified;
         public int RoundId { get; private set; }
         public long ElapsedMs { get; private set; }
         public SessionPhase Phase { get; private set; } = SessionPhase.LearningPatrol;
@@ -54,28 +55,58 @@ namespace REC.Core
         {
             data.GetData<RoundData>(roundId);
             List<MissionRuntime> allocated = planner.Allocate(roundId, ref nextOccurrenceId);
-            anomalies.Reset(); missions = allocated; readOnlyMissions = missions.AsReadOnly();
-            RoundId = roundId; ElapsedMs = 0; nextOpening = 0; observed = false; intermediateReturned = false;
+            anomalies.Reset(); missions = allocated;
+            readOnlyMissions = missions.AsReadOnly();
+            RoundId = roundId; ElapsedMs = 0;
+            nextOpening = 0;
+            observed = false;
+            intermediateReturned = false;
+            firstObservationNotified = false;
             Phase = SessionPhase.LearningPatrol; Publish("RoundStarted");
         }
         public void Tick(long elapsedMilliseconds)
         {
-            if (!started || elapsedMilliseconds < 0 || IsTerminal || Phase == SessionPhase.RoundComplete) return;
+            if (!started || elapsedMilliseconds < 0 || IsTerminal || Phase == SessionPhase.RoundComplete)
+                return;
+
             long remaining = rules.DeadlineMs - ElapsedMs;
             ElapsedMs += Math.Min(elapsedMilliseconds, remaining);
+
             try
             {
+                if (Phase == SessionPhase.LearningPatrol && ElapsedMs >= rules.IntermediateReturnMs)
+                {
+                    intermediateReturned = true;
+                    Phase = SessionPhase.ControlRoom;
+                    Publish("ForcedReturned");
+                }
+
                 while (nextOpening < missions.Count && missions[nextOpening].OpensAtMs <= ElapsedMs)
                 {
                     MissionRuntime mission = missions[nextOpening];
-                    anomalies.Activate(mission); nextOpening++; Publish("MissionOpened", mission);
+                    anomalies.Activate(mission);
+                    nextOpening++;
+                    Publish("MissionOpened", mission);
                 }
+
                 if (ElapsedMs >= rules.DeadlineMs && !AllResolved())
                 {
-                    Phase = SessionPhase.GameOver; anomalies.Freeze(); Publish("GameOver");
+                    Phase = SessionPhase.GameOver;
+                    anomalies.Freeze();
+                    Publish("GameOver");
+                    return;
+                }
+
+                if (!firstObservationNotified && ElapsedMs >= rules.FirstObservationMs)
+                {
+                    firstObservationNotified = true;
+                    Publish("FirstObservationReached");
                 }
             }
-            catch (Exception exception) { Fault(exception); }
+            catch (Exception exception)
+            {
+                Fault(exception);
+            }
         }
         public bool RequestEnterRoom()
         {

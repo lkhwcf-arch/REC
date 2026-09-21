@@ -14,7 +14,7 @@ public sealed class PlayerInteractor : MonoBehaviour
     private float interactionDistance = 3f;
 
     [SerializeField, Min(0.01f)]
-    private float holdDuration = 1f;
+    private float holdDuration = 2f;
 
     // 벽과 대상은 포함하고 Player 레이어는 제외
     [SerializeField]
@@ -33,6 +33,9 @@ public sealed class PlayerInteractor : MonoBehaviour
     { playerController = controller; playerCamera = camera; interactionRayMask = solidMask; interactionAreaMask = areaMask; }
 
     public event Action<Interact> TargetChanged;
+    public event Action<Interact> InteractionStarted;
+    public event Action<Interact> InteractionEnded;
+    private bool interactionInProgress;
 
     public Interact CurrentTarget
     {
@@ -114,6 +117,10 @@ public sealed class PlayerInteractor : MonoBehaviour
 
             pressedTarget = CurrentTarget;
             pressedTime = Time.time;
+            interactionInProgress = true;
+
+            Debug.Log("[입력] 홀드 시작 이벤트 발생", this);
+            InteractionStarted?.Invoke(pressedTarget);
         }
 
         if (pressedTarget == null)
@@ -152,7 +159,10 @@ public sealed class PlayerInteractor : MonoBehaviour
         holdTriggered = true;
 
         Interact target = pressedTarget;
-        target.Hold();
+        EndInteraction();
+
+        if (target != null && target.CanInteract)
+            target.Hold();
     }
 
     private Interact FindTarget()
@@ -195,6 +205,7 @@ public sealed class PlayerInteractor : MonoBehaviour
 
     private void CancelHold()
     {
+        EndInteraction();
         pressedTarget = null;
         pressedTime = 0f;
         holdTriggered = false;
@@ -210,6 +221,12 @@ public sealed class PlayerInteractor : MonoBehaviour
     private void OnApplicationFocus(bool hasFocus)
     {
         if (!hasFocus)
+            ResetInteraction();
+    }
+
+    private void OnApplicationPause(bool paused)
+    {
+        if (paused)
             ResetInteraction();
     }
 
@@ -229,4 +246,15 @@ public sealed class PlayerInteractor : MonoBehaviour
         return EventSystem.current != null &&
                EventSystem.current.IsPointerOverGameObject();
     }
+
+    private void EndInteraction()
+    {
+        if (!interactionInProgress)
+            return;
+
+        Interact target = pressedTarget;
+        interactionInProgress = false;
+        InteractionEnded?.Invoke(target);
+    }
+    public void CancelCurrentInteraction() => ResetInteraction();
 }
