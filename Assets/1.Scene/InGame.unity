@@ -1697,7 +1697,7 @@ MonoBehaviour:
   - {fileID: 476282619}
   - {fileID: 1710778857}
   - {fileID: 1402932277}
-  CCTVScreenPannel: {fileID: 20780370}
+  CCTVScreenPannel: {fileID: 685692088}
   gameoverCamera: {fileID: 0}
   gameclearCamera: {fileID: 0}
   playerUI: {fileID: 0}
