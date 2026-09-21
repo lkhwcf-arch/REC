@@ -17,8 +17,8 @@ namespace REC.Core
         public List<MissionRuntime> Allocate(int roundId, ref long nextOccurrenceId)
         {
             List<MissionRuntime> result = new();
-            var candidatesBySchedule = data.GetAllData<QuestData>().Where(q => q.RoundID == roundId).ToLookup(q => q.ScheduleID);
-            foreach (var schedule in data.GetAllData<ScheduleData>().Where(s => s.RoundID == roundId).OrderBy(s => s.SlotOrder))
+            var candidatesBySchedule = data.GetAllData<QuestData>().Where(q => q.Enabled == 1 && q.RoundID == roundId).ToLookup(q => q.ScheduleID);
+            foreach (var schedule in data.GetAllData<ScheduleData>().Where(s => s.Enabled == 1 && s.RoundID == roundId).OrderBy(s => s.SlotOrder))
             {
                 List<QuestData> candidates = candidatesBySchedule[schedule.ID].OrderBy(q => q.ID).ToList();
                 if (schedule.DrawCount <= 0 || schedule.DrawCount > candidates.Count) throw new InvalidOperationException($"Schedule={schedule.ID}: 추첨 수가 잘못되었습니다.");

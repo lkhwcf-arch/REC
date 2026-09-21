@@ -36,9 +36,20 @@ public class PlayerController : MonoBehaviour
     private bool controlsActive;
     private bool applicationFocused = true;
     private int controlStartFrame = -1;
+    private bool sessionControlAllowed = true;
+    public event System.Action ReturnRequested;
+    public void SetSessionControl(bool allowed) => sessionControlAllowed = allowed;
+    public void Teleport(Vector3 position, Quaternion rotation)
+    {
+        characterController ??= GetComponent<CharacterController>();
+        characterController.enabled = false; transform.SetPositionAndRotation(position, rotation); characterController.enabled = true;
+        verticalSpeed = 0; pitch = 0;
+        if (cameraTarget != null) cameraTarget.localRotation = Quaternion.identity;
+    }
 
     private bool CanControl =>
         applicationFocused &&
+        sessionControlAllowed &&
         cameraManager != null &&
         cameraManager.IsPlayerView &&
         player != null &&
@@ -117,7 +128,8 @@ public class PlayerController : MonoBehaviour
         if (canControl &&
             returnToCCTVAction.WasPressedThisFrame())
         {
-            cameraManager.ShowCCTV();
+            if (ReturnRequested != null) ReturnRequested.Invoke();
+            else cameraManager.ShowCCTV();
             canControl = CanControl;
         }
 

@@ -37,7 +37,8 @@ public sealed class GameDataBootstrapper : MonoBehaviour
             { "TargetCodes", csv => LoadTable<TargetCodeData>(csv, pendingData) },
             { "Quest", csv => LoadTable<QuestData>(csv, pendingData) },
             { "Schedule", csv => LoadTable<ScheduleData>(csv, pendingData) },
-            { "Round", csv => LoadTable<RoundData>(csv, pendingData) }
+            { "Round", csv => LoadTable<RoundData>(csv, pendingData) },
+            { "Door", csv => LoadTable<DoorData>(csv, pendingData) }
         };
 
         var loadedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

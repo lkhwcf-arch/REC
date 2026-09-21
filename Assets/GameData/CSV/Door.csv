@@ -1,0 +1,7 @@
+ID,SceneBinding,InteriorBinding,HingeSide,OpenAngle,AngularSpeed
+1,Interection_Obj/Door/Mortuary_R_Door,Interection_Obj/Interaction/I_8,1,90,120
+2,Interection_Obj/Door/Mortuary_L_Door,Interection_Obj/Interaction/I_8,-1,90,120
+3,Interection_Obj/Door/Family_Door,Interection_Obj/Interaction/I_3,-1,90,120
+4,Interection_Obj/Door/Outer_Coffin_L_Door,Interection_Obj/Interaction/I_2,1,90,120
+5,Interection_Obj/Door/Outer_Coffin_R_Door,Interection_Obj/Interaction/I_2,-1,90,120
+6,Interection_Obj/Door/Inner_Coffin_Door,Interection_Obj/Interaction/I_2,-1,90,120

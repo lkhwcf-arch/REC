@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace REC.Core
 {
@@ -58,7 +59,9 @@ namespace REC.Core
         private readonly IReadOnlyDictionary<int, IAnomalyBody> bodies;
         private readonly ActionCatalog catalog;
         private readonly List<MissionRuntime> active = new();
-        public AnomalyRuntime(IReadOnlyDictionary<int, IAnomalyBody> bodies, ActionCatalog catalog) { this.bodies = bodies; this.catalog = catalog; }
+        private readonly IAnomalyBody[] distinctBodies;
+        public AnomalyRuntime(IReadOnlyDictionary<int, IAnomalyBody> bodies, ActionCatalog catalog)
+        { this.bodies = bodies; this.catalog = catalog; distinctBodies = bodies.Values.Distinct().ToArray(); }
         public void Validate(MissionRuntime mission)
         {
             if (!bodies.TryGetValue(mission.TargetId, out var body)) throw new InvalidOperationException($"Quest={mission.QuestId}: TargetID={mission.TargetId}의 맵 연결이 없습니다.");
@@ -68,7 +71,7 @@ namespace REC.Core
         }
         public void Capture()
         {
-            foreach (var body in bodies.Values) { body.CaptureBaseline(); body.SetActionable(false); }
+            foreach (var body in distinctBodies) { body.CaptureBaseline(); body.SetActionable(false); }
         }
         public void Activate(MissionRuntime mission)
         {
@@ -89,17 +92,17 @@ namespace REC.Core
         }
         private void Rebuild(int targetId)
         {
-            IAnomalyBody body = bodies[targetId]; body.RestoreBaseline();
-            bool actionable = false;
+            // 별칭 ID와 부모/자식 대상도 같은 기준 상태 위에 재적용합니다. 사건 전환 때만 실행합니다.
+            foreach (var body in distinctBodies) { body.RestoreBaseline(); body.SetActionable(false); }
             foreach (var mission in active)
-                if (mission.TargetId == targetId) { catalog.Get(mission.BeginAction).Apply(body, mission.Movement); actionable = true; }
-            body.SetActionable(actionable);
+                catalog.Get(mission.BeginAction).Apply(bodies[mission.TargetId], mission.Movement);
+            foreach (var mission in active) bodies[mission.TargetId].SetActionable(true);
         }
-        public void Freeze() { foreach (var body in bodies.Values) body.SetActionable(false); }
+        public void Freeze() { foreach (var body in distinctBodies) body.SetActionable(false); }
         public void Reset()
         {
             active.Clear();
-            foreach (var body in bodies.Values) { body.RestoreBaseline(); body.SetActionable(false); }
+            foreach (var body in distinctBodies) { body.RestoreBaseline(); body.SetActionable(false); }
         }
     }
 }

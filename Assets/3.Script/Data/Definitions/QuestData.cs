@@ -5,6 +5,8 @@ using UnityEngine;
 public sealed class QuestData : ICSVData
 {
     public int ID { get; set; }
+    public int Enabled { get; set; } = 1;
+    public string DisabledReason { get; set; }
     public int RoundID { get; set; }
     public int ScheduleID { get; set; }
     public long RealTime { get; set; }

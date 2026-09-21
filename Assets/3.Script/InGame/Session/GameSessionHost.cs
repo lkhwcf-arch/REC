@@ -49,7 +49,9 @@ public class GameSessionHost : MonoBehaviour
         Dictionary<int, IAnomalyBody> bodies = new();
         foreach (var target in targets)
         {
-            if (target == null || !bodies.TryAdd(target.TargetId, target)) { Debug.LogError("[회차 초기화] 비어 있거나 중복된 대상 연결입니다.", this); enabled = false; return; }
+            if (target == null) { Debug.LogError("[회차 초기화] 대상 연결이 비었습니다.", this); enabled = false; return; }
+            foreach (int id in target.TargetIds)
+                if (!bodies.TryAdd(id, target)) { Debug.LogError($"[회차 초기화] TargetID={id} 연결이 중복되었습니다.", this); enabled = false; return; }
         }
         try
         {

@@ -42,6 +42,7 @@ namespace REC.Core
                 // 미완성 맵은 사전 연결 오류로 보고합니다. 후보를 몰래 제외하여 추첨 확률을 바꾸지 않습니다.
                 foreach (var quest in data.GetAllData<QuestData>())
                 {
+                    if (quest.Enabled == 0) continue;
                     if (quest.RealTime < rules.FirstObservationMs || quest.RealTime >= rules.DeadlineMs) throw new InvalidOperationException($"Quest={quest.ID}: 오픈 시각이 첫 사건~마감 전 범위를 벗어났습니다.");
                     anomalies.Validate(planner.Create(quest, 0));
                 }

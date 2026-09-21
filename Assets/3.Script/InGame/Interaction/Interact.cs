@@ -10,6 +10,8 @@ public enum InteractionInputType
 public class Interact : MonoBehaviour
 {
     public event System.Action HoldCompleted;
+    public event System.Action ClickCompleted;
+    public void Configure(InteractionInputType type, bool enabled = true) { inputType = type; interactionEnabled = enabled; }
     [SerializeField] private bool interactionEnabled = true;
     [Header("입력 방식")]
     [SerializeField] private InteractionInputType inputType = InteractionInputType.Hold;
@@ -28,6 +30,7 @@ public class Interact : MonoBehaviour
 
         Debug.Log($"단발 클릭: {name}", this);
         onClick.Invoke();
+        ClickCompleted?.Invoke();
     }
 
     public void Hold()
