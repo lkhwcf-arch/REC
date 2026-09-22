@@ -1,0 +1,46 @@
+[
+  {
+    "file": "GhostCrawlerV2_Animated.fbx",
+    "vertices": 5234,
+    "triangles": 8938,
+    "bones": 22,
+    "rest_max_vertex_error": 1.077117914860537e-07,
+    "uv_preserved": true,
+    "max_influences": 4,
+    "weights_normalized": true,
+    "texture_found": true,
+    "texture_dimensions": [
+      2048,
+      2048
+    ],
+    "texture_hash_matches_supplied": true,
+    "actions": [
+      "IDLE",
+      "RUN",
+      "WALK"
+    ],
+    "roundtrip_max_vertex_error": {
+      "IDLE": 1.0162402759306133e-06,
+      "RUN": 8.833573588162835e-07,
+      "WALK": 1.0220338708677446e-06
+    }
+  },
+  {
+    "file": "GhostCrawlerV2_OriginalRest.fbx",
+    "vertices": 5234,
+    "triangles": 8938,
+    "bones": 22,
+    "rest_max_vertex_error": 1.077117914860537e-07,
+    "uv_preserved": true,
+    "max_influences": 4,
+    "weights_normalized": true,
+    "texture_found": true,
+    "texture_dimensions": [
+      2048,
+      2048
+    ],
+    "texture_hash_matches_supplied": true,
+    "actions": [],
+    "roundtrip_max_vertex_error": {}
+  }
+]

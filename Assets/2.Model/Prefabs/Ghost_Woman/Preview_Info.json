@@ -1,0 +1,20 @@
+[
+  {
+    "clip": "IDLE",
+    "preview_frames": 30,
+    "duration_ms": 3000,
+    "animated_gif": "IDLE_Preview.gif"
+  },
+  {
+    "clip": "WALK",
+    "preview_frames": 24,
+    "duration_ms": 1600,
+    "animated_gif": "WALK_Preview.gif"
+  },
+  {
+    "clip": "RUN",
+    "preview_frames": 24,
+    "duration_ms": 800,
+    "animated_gif": "RUN_Preview.gif"
+  }
+]
