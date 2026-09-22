@@ -18,7 +18,12 @@ public class PresentationDirector : MonoBehaviour
     {
         if (message.Kind == "RoundStarted")
         {
-            StopAll();
+            foreach (PresentationEffect effect in effects)
+            {
+                if (effect != null)
+                    effect.ResetForRound();
+            }
+
             Array.Clear(played, 0, played.Length);
             return;
         }
@@ -33,11 +38,11 @@ public class PresentationDirector : MonoBehaviour
         {
             PresentationEffect effect = effects[i];
 
-            if (effect == null || !effect.isActiveAndEnabled || played[i] ||
-                effect.TriggerEvent != message.Kind)
+            if (effect == null || !effect.isActiveAndEnabled || played[i] || !effect.Matches(message))
                 continue;
 
             played[i] = true;
+            Debug.Log($"[연출 발동] {effect.name} / 이벤트={message.Kind} / 회차={message.RoundId} / 퀘스트={message.QuestId} / 대상={message.TargetId}", effect);
             effect.Play();
             effect.SetPaused(suspended);
         }
