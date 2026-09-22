@@ -3249,6 +3249,8 @@ GameObject:
   - component: {fileID: 900100003}
   - component: {fileID: 900100004}
   - component: {fileID: 900100005}
+  - component: {fileID: 900100006}
+  - component: {fileID: 900100007}
   m_Layer: 0
   m_Name: InGameCore
   m_TagString: Untagged
@@ -3302,6 +3304,9 @@ MonoBehaviour:
   outlineOpacity: 0.9
   ghostOpacity: 0.15
   outlineWidth: 0.035
+  additionalTargetBindings:
+  - Interection_Obj/Interaction/I_14
+  - NonInterection/SYNC_04__UNI_02_FoldedBlanket
   cctvPoses:
   - index: 0
     position: {x: 2.8, y: 2.8, z: -5.6}
@@ -3362,6 +3367,85 @@ MonoBehaviour:
   eyesOffset: {x: 0, y: -0.12, z: 0}
   eyeSpacing: 0.065
   eyeSize: 0.025
+--- !u!114 &900100006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900100001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91caaecfcef4e78a13cdd1a98767ddf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::RoundThreePresentation
+  roundId: 3
+  questId: 15
+  blanketName: SYNC_04__UNI_02_FoldedBlanket
+  bloodName: I_15
+  standingWoman:
+    prefab: {fileID: 919132149155446097, guid: c42e6f882cb2d2048b24816818132fa0, type: 3}
+    controller: {fileID: 9100000, guid: 28df9f48b0c0d2e4aa80a48d7a4a34bb, type: 2}
+    height: 1.7
+    facingOffset: 0
+  crawlerWoman:
+    prefab: {fileID: 919132149155446097, guid: 66966774285501348916ef5d839592a4, type: 3}
+    controller: {fileID: 9100000, guid: 396d2e83b7ca0a44698edd3a6828b6d6, type: 2}
+    height: 0.8
+    facingOffset: 0
+  standingAnchor: {fileID: 0}
+  corridorAnchor: {fileID: 0}
+  rushAnchor: {fileID: 0}
+  standingOffset: {x: 0.8, y: 0, z: 0}
+  corridorOffset: {x: 1.5, y: 0, z: 0}
+  triggerSize: {x: 2.5, y: 3, z: 3}
+  corridorLights: []
+  blinkCount: 3
+  darkSeconds: 0.2
+  lightSeconds: 0.25
+  blackoutSeconds: 0.5
+  rushDistance: 6
+  rushSpeed: 7
+  passDistance: 3
+  shakeDegrees: 1.8
+  flashPeriod: 0.16
+  flashOpacity: 0.9
+  blackoutClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+  rushClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+--- !u!114 &900100007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900100001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d97dd46c6c4146b07fffcf1f2048a1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::RoundFourPresentation
+  roundId: 4
+  questId: 28
+  portraitName: I_14
+  man:
+    prefab: {fileID: 8962774763559999609, guid: 32aca342f28c578498fe92ad902e11db, type: 3}
+    controller: {fileID: 0}
+    height: 1.8
+    facingOffset: 0
+  peekAnchor: {fileID: 0}
+  retreatAnchor: {fileID: 0}
+  approachAnchor: {fileID: 0}
+  closeAnchor: {fileID: 0}
+  peekOffset: {x: 0.25, y: 0, z: 0}
+  approachSize: {x: 10, y: 3, z: 10}
+  closeSize: {x: 3, y: 3, z: 3}
+  retreatSeconds: 1
+  ambienceSources: []
+  temporaryAmbience: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+  heartbeatClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+  endingClip: {fileID: 0}
+  temporaryEndingSeconds: 2
+  videoPrepareTimeout: 10
 --- !u!1 &926289882
 GameObject:
   m_ObjectHideFlags: 0

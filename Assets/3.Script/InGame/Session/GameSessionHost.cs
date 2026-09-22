@@ -9,7 +9,6 @@ using UnityEngine.Events;
 // Unity 생명주기, 데이터 저장소, 맵 어댑터를 조립하는 구성 루트입니다.
 public class GameSessionHost : MonoBehaviour
 {
-
     [SerializeField] private GameDataBootstrapper dataBootstrapper;
     [SerializeField] private AnomalyTargetAdapter[] targets = Array.Empty<AnomalyTargetAdapter>();
     [SerializeField] private RoundResetScope resetScope;
@@ -28,6 +27,12 @@ public class GameSessionHost : MonoBehaviour
     [SerializeField] private UnityEvent onGameOver = new();
     private double remainderMs;
     private bool initialized;
+    private int endingQuestId;
+    public void ConfigureEndingQuest(int questId)
+    {
+        if (initialized) throw new InvalidOperationException("엔딩 미션은 세션 초기화 전에 연결하세요.");
+        endingQuestId = questId;
+    }
     public GameSession Session { get; private set; }
     public event Action<SessionEvent> Changed;
     public void Configure(GameDataBootstrapper data, AnomalyTargetAdapter[] bindings, RoundResetScope scope = null, int firstRound = 1, int seed = 1709)
@@ -59,7 +64,7 @@ public class GameSessionHost : MonoBehaviour
             if (resetScope != null) resetScope.Capture();
             var rules = new SessionRules(millisecondsPerMinute, startMinute, intermediateReturnMinute, firstObservationMinute, roundDurationMinutes);
             var planner = new MissionPlanner(dataBootstrapper.Data, new SeededRandom(randomSeed));
-            Session = new GameSession(dataBootstrapper.Data, planner, new AnomalyRuntime(bodies, new AnomalyActionRegistry()), rules);
+            Session = new GameSession(dataBootstrapper.Data, planner, new AnomalyRuntime(bodies, new AnomalyActionRegistry()), rules, endingQuestId);
             Session.Changed += OnChanged;
             foreach (var target in targets) target.Bind(Session);
             Session.Start(firstRoundId);
@@ -68,25 +73,46 @@ public class GameSessionHost : MonoBehaviour
     }
     private void Update()
     {
-        if (Session == null || Time.timeScale <= 0 || !Application.isFocused) return;
+        if (Session == null || Time.timeScale <= 0 || !Application.isFocused)
+            return;
+
         remainderMs += Time.unscaledDeltaTime * 1000.0;
         long step = (long)remainderMs; remainderMs -= step; Session.Tick(step);
     }
     private void OnChanged(SessionEvent message)
     {
-        if (message.Kind == "RoundStarted") { remainderMs = 0; if (resetScope != null) resetScope.ResetMap(); }
+        if (message.Kind == "RoundStarted")
+        {
+            remainderMs = 0;
+            if (resetScope != null)
+                resetScope.ResetMap();
+        }
         // 연출 실패가 이미 완료된 도메인 상태 변경을 되돌리지 않도록 경계를 분리합니다.
         try
         {
-            if (message.Kind == "RoundStarted") onRoundReset.Invoke();
-            if (message.Kind == "GameOver") onGameOver.Invoke();
-            if (message.Kind == "GameClear") onGameClear.Invoke();
+            if (message.Kind == "RoundStarted")
+                onRoundReset.Invoke();
+            if (message.Kind == "GameOver")
+                onGameOver.Invoke();
+            if (message.Kind == "GameClear")
+                onGameClear.Invoke();
+
             onPresentationCue.Invoke(message.Kind, message.DirectionGroupId, message.TargetId);
         }
-        catch (Exception exception) { Debug.LogException(exception, this); }
+        catch (Exception exception)
+        {
+            Debug.LogException(exception, this);
+        }
         if (Changed != null)
             foreach (Action<SessionEvent> listener in Changed.GetInvocationList())
-                try { listener(message); } catch (Exception exception) { Debug.LogException(exception, this); }
+                try
+                {
+                    listener(message);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception, this);
+                }
         if (message.Kind == "ConfigurationError") Debug.LogError($"[회차 설정 오류] {Session.Error}", this);
         else Debug.Log($"[회차] {message.Kind} | Round={message.RoundId} Quest={message.QuestId} Target={message.TargetId}", this);
     }
@@ -98,8 +124,15 @@ public class GameSessionHost : MonoBehaviour
     private void OnDestroy()
     {
         // 씬 파괴 시 대상의 OnDestroy 순서는 보장되지 않습니다. 재시작 초기화는 BeginRound가 소유합니다.
-        if (Session != null) { Session.Changed -= OnChanged; Session.Stop(false); }
-        foreach (var target in targets) if (target != null) target.Unbind();
+        if (Session != null)
+        {
+            Session.Changed -= OnChanged;
+            Session.Stop(false);
+        }
+
+        foreach (var target in targets)
+            if (target != null)
+                target.Unbind();
     }
 
 #if UNITY_EDITOR

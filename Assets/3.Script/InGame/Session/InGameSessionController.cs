@@ -18,6 +18,9 @@ public class InGameSessionController : MonoBehaviour
     private bool paused, observed, changingScene;
     private float previousTimeScale = 1;
     public bool IsPaused => paused;
+    public bool IsEnding => host?.Session?.Phase == SessionPhase.Ending || endingPreview;
+    private bool endingPreview;
+    public void SetEndingPreview(bool value) { endingPreview = value; ViewChanged?.Invoke(); }
     public string Notice { get; private set; }
     public event Action ViewChanged;
     public event Action<string> ResultRequested;
@@ -40,7 +43,7 @@ public class InGameSessionController : MonoBehaviour
     }
     private void Update()
     {
-        if (host?.Session == null || changingScene) return;
+        if (host?.Session == null || changingScene || IsEnding) return;
         var keyboard = Keyboard.current;
         if (keyboard != null && keyboard.escapeKey.wasPressedThisFrame && !host.Session.IsTerminal) SetPaused(!paused);
         if (!paused && keyboard != null && keyboard.nKey.wasPressedThisFrame) RequestSkip();
@@ -62,25 +65,30 @@ public class InGameSessionController : MonoBehaviour
     }
     public void RequestReturn()
     {
+        if (IsEnding) return;
         if (paused) return;
         if (!NearEntrance) { SetNotice("CCTV실 문 앞으로 이동한 뒤 Tab을 누르세요."); return; }
         if (host.Session?.RequestEnterRoom() != true) SetNotice("남은 미션을 모두 해결한 뒤 복귀할 수 있습니다.");
     }
     public void RequestObserve()
     {
+        if (IsEnding) return;
         if (host.Session?.RequestObserveCctv() != true) SetNotice("23:30부터 CCTV를 확인할 수 있습니다.");
     }
     public void RequestPatrol()
     {
+        if (IsEnding) return;
         if (host.Session?.RequestLeaveRoom() != true) SetNotice("CCTV를 먼저 확인하세요.");
     }
     public void RequestSkip()
     {
+        if (IsEnding) return;
         if (host.Session?.RequestSkip() != true) SetNotice("지금은 다음 일정으로 건너뛸 수 없습니다.");
     }
     public void RequestNextRound() => host.Session?.RequestNextRound();
     public void SetPaused(bool value)
     {
+        if (IsEnding && value) return;
         if (paused == value)
             return;
 
@@ -141,6 +149,11 @@ public class InGameSessionController : MonoBehaviour
         }
         if (message.Kind == "AllMissionsResolved")
             SetNotice("미션을 모두 해결했습니다. CCTV실로 최종 복귀하세요.");
+        if (message.Kind == "EndingStarted")
+        {
+            interactor?.CancelCurrentInteraction();
+            SetNotice("엔딩 재생 중입니다.");
+        }
         if (message.Kind == "RoundCompleted")
         {
             cameras.ShowCCTV();

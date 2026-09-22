@@ -3,10 +3,31 @@ using System.Collections.Generic;
 
 namespace REC.Core
 {
-    public enum SessionPhase { LearningPatrol, ControlRoom, AnomalyPatrol, AwaitFinalReturn, RoundComplete, GameClear, GameOver, ConfigurationError }
-    public enum MissionStatus { Locked, Active, Resolved }
-    public enum MovementKind { Offset, Rotation, GroupPosition }
-    public enum MovementAxis { X, Y, Z }
+    public enum SessionPhase
+    {
+        LearningPatrol,
+        ControlRoom,
+        AnomalyPatrol,
+        AwaitFinalReturn,
+        RoundComplete, GameClear,
+        GameOver,
+        ConfigurationError,
+        Ending
+    }
+    public enum MissionStatus
+    {
+        Locked,
+        Active,
+        Resolved
+    }
+    public enum MovementKind
+    {
+        Offset,
+        Rotation,
+        GroupPosition
+    }
+    public enum MovementAxis
+    { X, Y, Z }
 
     public readonly struct MovementSpec
     {

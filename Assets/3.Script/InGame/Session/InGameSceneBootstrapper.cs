@@ -23,6 +23,8 @@ public class InGameSceneBootstrapper : MonoBehaviour
     [SerializeField, Range(0, 1)] private float ghostOpacity = 0.15f;
     [SerializeField, Range(0, 0.2f)] private float outlineWidth = 0.035f;
     [SerializeField] private CctvPose[] cctvPoses = Array.Empty<CctvPose>();
+    [Tooltip("기존 I_1~I_13 외에 데이터 테이블 등록 후 허용할 정확한 맵 경로입니다.")]
+    [SerializeField] private string[] additionalTargetBindings = Array.Empty<string>();
     public GameSessionHost Host { get; private set; }
     public InGameSessionController Controller { get; private set; }
     public string Error { get; private set; }
@@ -70,6 +72,12 @@ public class InGameSceneBootstrapper : MonoBehaviour
             {
                 if (string.IsNullOrWhiteSpace(row.SceneBinding))
                     throw new InvalidOperationException($"TargetID={row.ID}: SceneBinding이 없습니다.");
+
+                if (Array.IndexOf(additionalTargetBindings, row.SceneBinding) >= 0)
+                {
+                    sources[row.SceneBinding] = Required(mapRoot, row.SceneBinding);
+                    continue;
+                }
 
                 if (!row.SceneBinding.StartsWith("Interection_Obj/Interaction/", StringComparison.Ordinal))
                     throw new InvalidOperationException($"TargetID={row.ID}: 허용된 Interaction 경로가 아닙니다.");
@@ -129,6 +137,11 @@ public class InGameSceneBootstrapper : MonoBehaviour
             var coffinPresentation = GetComponent<RoundTwoCoffinPresentation>();
             if (coffinPresentation != null && coffinPresentation.enabled)
                 coffinPresentation.Configure(Host, adapters, player, interactor, outputCamera);
+            Physics.SyncTransforms();
+            var roundThree = GetComponent<RoundThreePresentation>();
+            if (roundThree != null && roundThree.enabled) roundThree.Configure(Host, player, outputCamera, mapRoot);
+            var roundFour = GetComponent<RoundFourPresentation>();
+            if (roundFour != null && roundFour.enabled) roundFour.Configure(Host, Controller, player, interactor, mapRoot);
             Host.Initialize();
 
             if (Host.Session == null || Host.Session.Phase == SessionPhase.ConfigurationError)
