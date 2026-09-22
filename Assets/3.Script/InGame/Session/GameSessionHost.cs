@@ -9,6 +9,7 @@ using UnityEngine.Events;
 // Unity 생명주기, 데이터 저장소, 맵 어댑터를 조립하는 구성 루트입니다.
 public class GameSessionHost : MonoBehaviour
 {
+
     [SerializeField] private GameDataBootstrapper dataBootstrapper;
     [SerializeField] private AnomalyTargetAdapter[] targets = Array.Empty<AnomalyTargetAdapter>();
     [SerializeField] private RoundResetScope resetScope;
@@ -100,4 +101,34 @@ public class GameSessionHost : MonoBehaviour
         if (Session != null) { Session.Changed -= OnChanged; Session.Stop(false); }
         foreach (var target in targets) if (target != null) target.Unbind();
     }
+
+#if UNITY_EDITOR
+    [Header("에디터 테스트")]
+    [SerializeField, Min(1)] private int testRoundId = 2;
+#endif
+#if UNITY_EDITOR
+    [ContextMenu("테스트/지정 회차 시작")]
+    private void StartTestRound()
+    {
+        if (!Application.isPlaying)
+        {
+            Debug.LogWarning("[회차 테스트] 플레이 중에 실행하세요.", this);
+            return;
+        }
+
+        if (!isActiveAndEnabled || Session == null)
+        {
+            Debug.LogWarning("[회차 테스트] 실행 가능한 세션이 없습니다.", this);
+            return;
+        }
+
+        if (!Session.RequestTestRound(testRoundId, out string error))
+        {
+            Debug.LogWarning($"[회차 테스트] {error}", this);
+            return;
+        }
+
+        Debug.Log($"[회차 테스트] {testRoundId}회차를 22:00부터 시작합니다.", this);
+    }
+#endif
 }

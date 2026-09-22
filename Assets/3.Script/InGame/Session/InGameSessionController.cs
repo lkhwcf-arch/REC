@@ -105,7 +105,18 @@ public class InGameSessionController : MonoBehaviour
         var session = host.Session;
         if (message.Kind == "RoundStarted")
         {
-            observed = false; player.Teleport(spawn, spawnRotation); lastOutside = spawn; cameras.ShowPlayer();
+            interactor?.CancelCurrentInteraction();
+
+            if (paused)
+                SetPaused(false);
+
+            changingScene = false;
+            observed = false;
+
+            player.Teleport(spawn, spawnRotation);
+            lastOutside = spawn;
+            cameras.ShowPlayer();
+
             SetNotice("초기 순찰을 진행하세요. 23:00에는 CCTV실로 자동 복귀합니다.");
         }
         if (message.Kind is "IntermediateReturned" or "ForcedReturned")
