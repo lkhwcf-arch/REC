@@ -77,7 +77,7 @@ public class AnomalyTargetAdapter : MonoBehaviour, IAnomalyBody, IRecoveryAudioT
         {
             MissionRuntime candidate = missions[i];
 
-            if (candidate.Status != MissionStatus.Active)
+            if (candidate.Status != MissionStatus.Active || !session.CanResolve(candidate))
                 continue;
 
             if (selected != null && candidate.OccurrenceId >= selected.OccurrenceId)

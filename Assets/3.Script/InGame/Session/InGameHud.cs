@@ -62,7 +62,7 @@ public class InGameHud : MonoBehaviour
         var session = host.Session;
         status.text = $"{session.RoundId}회차 · 해결 {session.Missions.Count(m => m.Status == MissionStatus.Resolved)} / {session.Missions.Count}";
         notice.text = session.Phase == SessionPhase.ConfigurationError ? session.Error : controller.Notice;
-        controls.SetActive(controller.IsPaused || !session.CanPatrol);
+        controls.SetActive(!controller.IsEnding && (controller.IsPaused || !session.CanPatrol));
         skip.gameObject.SetActive(session.Phase is SessionPhase.ControlRoom or SessionPhase.AnomalyPatrol);
         observe.gameObject.SetActive(session.Phase == SessionPhase.ControlRoom); observe.interactable = session.ElapsedMs >= session.Rules.FirstObservationMs && !controller.Observed;
         patrol.gameObject.SetActive(session.Phase == SessionPhase.ControlRoom); patrol.interactable = controller.Observed;
