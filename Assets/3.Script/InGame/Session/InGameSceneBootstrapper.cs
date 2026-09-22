@@ -126,6 +126,9 @@ public class InGameSceneBootstrapper : MonoBehaviour
             outputCamera.nearClipPlane = 0.03f;
 
             var hud = gameObject.AddComponent<InGameHud>(); hud.Configure(Host, Controller, interactor);
+            var coffinPresentation = GetComponent<RoundTwoCoffinPresentation>();
+            if (coffinPresentation != null && coffinPresentation.enabled)
+                coffinPresentation.Configure(Host, adapters, player, interactor, outputCamera);
             Host.Initialize();
 
             if (Host.Session == null || Host.Session.Phase == SessionPhase.ConfigurationError)
