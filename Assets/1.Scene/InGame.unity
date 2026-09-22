@@ -3248,6 +3248,7 @@ GameObject:
   - component: {fileID: 900100002}
   - component: {fileID: 900100003}
   - component: {fileID: 900100004}
+  - component: {fileID: 900100005}
   m_Layer: 0
   m_Name: InGameCore
   m_TagString: Untagged
@@ -3329,6 +3330,38 @@ MonoBehaviour:
   effects:
   - {fileID: 552682943}
   - {fileID: 6743366043626121151}
+--- !u!114 &900100005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 900100001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c225f2fea45f43e998f99e338389e142, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoundTwoCoffinPresentation
+  roundId: 2
+  questId: 8
+  targetId: 4
+  ghostPrefab: {fileID: 919132149155446097, guid: c42e6f882cb2d2048b24816818132fa0, type: 3}
+  ghostController: {fileID: 9100000, guid: 28df9f48b0c0d2e4aa80a48d7a4a34bb, type: 2}
+  spawnDistance: 2
+  ghostHeight: 1.7
+  facingOffset: 0
+  fallbackSpawn: {fileID: 0}
+  viewportHalfSize: {x: 0.18, y: 0.25}
+  recognitionDistance: 5
+  inputBlockDuration: 1
+  disappearDelayAfterBlock: 1.5
+  sightInterval: 0.05
+  obstructionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  eyesOffset: {x: 0, y: -0.12, z: 0}
+  eyeSpacing: 0.065
+  eyeSize: 0.025
 --- !u!1 &926289882
 GameObject:
   m_ObjectHideFlags: 0

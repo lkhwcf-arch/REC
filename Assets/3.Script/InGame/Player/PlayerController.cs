@@ -37,6 +37,13 @@ public class PlayerController : MonoBehaviour
     private bool applicationFocused = true;
     private int controlStartFrame = -1;
     private bool sessionControlAllowed = true;
+    private readonly System.Collections.Generic.HashSet<object> presentationLocks = new();
+    public void SetPresentationLock(object owner, bool locked)
+    {
+        if (owner == null) return;
+        if (locked) presentationLocks.Add(owner);
+        else presentationLocks.Remove(owner);
+    }
     public event System.Action ReturnRequested;
     public void SetSessionControl(bool allowed) => sessionControlAllowed = allowed;
     public void Teleport(Vector3 position, Quaternion rotation)
@@ -50,6 +57,7 @@ public class PlayerController : MonoBehaviour
     private bool CanControl =>
         applicationFocused &&
         sessionControlAllowed &&
+        presentationLocks.Count == 0 &&
         cameraManager != null &&
         cameraManager.IsPlayerView &&
         player != null &&
