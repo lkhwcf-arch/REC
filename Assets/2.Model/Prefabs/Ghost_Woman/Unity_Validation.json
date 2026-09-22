@@ -1,0 +1,34 @@
+{
+    "unityVersion": "6000.2.8f1",
+    "rigType": "Generic",
+    "avatarValid": true,
+    "humanoid": false,
+    "skinnedRenderers": 1,
+    "vertices": 10132,
+    "triangles": 8938,
+    "bones": 22,
+    "width": 0.99951171875,
+    "height": 0.6049803495407105,
+    "depth": 0.9438475370407105,
+    "textureAssigned": true,
+    "textureWidth": 2048,
+    "textureHeight": 2048,
+    "clips": [
+        "IDLE",
+        "RUN",
+        "WALK"
+    ],
+    "durations": [
+        3.000000238418579,
+        0.8000000715255737,
+        1.6000001430511475
+    ],
+    "loops": [
+        true,
+        true,
+        true
+    ],
+    "maxRootDisplacement": 0.0,
+    "maxLoopError": 0.0,
+    "materialSupported": true
+}

@@ -1,0 +1,1 @@
+{"playMode":true,"graphicsDevice":"Direct3D11","shaderSupported":true,"states":[{"clip":"IDLE","animatorStatePassed":true,"maximumVertexMovement":0.0045332,"rootDisplacement":0},{"clip":"WALK","animatorStatePassed":true,"maximumVertexMovement":0.145844743,"rootDisplacement":0},{"clip":"RUN","animatorStatePassed":true,"maximumVertexMovement":0.30519098,"rootDisplacement":0}]}

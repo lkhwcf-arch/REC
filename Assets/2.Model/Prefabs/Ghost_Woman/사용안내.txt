@@ -1,0 +1,79 @@
+텍스처 포함 네발 귀신 리깅 V2
+
+첨부해 주신 3D 원본과 텍스처를 사용했습니다.
+GIF의 큰 손 뻗기, 손발 들어 올리기, 몸통의 좌우 움직임을 참고해 기존보다 동작 폭을 키웠습니다.
+원본 모델의 비대칭 네발 자세와 형태, UV를 보존했습니다.
+걷기와 달리기는 이전에 선택하신 제자리 동작입니다. 실제 이동은 게임에서 제어합니다.
+
+1. 가장 간단한 Unity 사용 방법
+
+URP 프로젝트에서 Assets > Import Package > Custom Package로
+GhostCrawlerV2_Unity6_URP.unitypackage를 가져오세요.
+
+아래 프리팹을 씬에 넣으면 텍스처와 애니메이터가 연결된 상태로 사용할 수 있습니다.
+Assets/REC_GhostCrawlerV2/Prefabs/GhostCrawlerV2.prefab
+
+미리보기 씬:
+Assets/REC_GhostCrawlerV2/Scenes/GhostCrawlerV2_Preview.unity
+
+Animator의 정수 파라미터 Motion으로 동작을 선택합니다.
+0 = IDLE / 대기
+1 = WALK / 천천히 기어가기
+2 = RUN / 빠르게 기어가기
+
+재생 중 Animator 창의 Parameters에서 Motion 값을 바꾸어 확인할 수 있습니다.
+게임 코드에서는 해당 캐릭터 Animator의 SetInteger("Motion", 값)을 사용합니다.
+Apply Root Motion은 꺼져 있습니다. 이동은 캐릭터 부모 오브젝트에 적용하세요.
+모델 원래 크기, 재생 속도 1 기준의 이동 속도 시작값은 WALK 약 0.2m/s, RUN 약 0.65m/s입니다.
+원본의 비대칭 자세 때문에 팔다리별 보폭이 다릅니다. 프로젝트의 캐릭터 크기와 속도에 맞춰 조절하세요.
+
+원본 자세를 확인하는 프리팹:
+Assets/REC_GhostCrawlerV2/Prefabs/GhostCrawlerV2_OriginalRest.prefab
+이 프리팹은 애니메이션이 꺼져 있습니다.
+
+2. Blender / FBX 파일
+
+GhostCrawlerV2_Rigged.blend: 텍스처가 내장된 편집 파일. IDLE이 선택되어 있습니다.
+GhostCrawlerV2_OriginalRest.blend: 원본 형태 확인용. 애니메이션이 선택되어 있지 않습니다.
+GhostCrawlerV2_Animated.fbx: 리깅과 IDLE/WALK/RUN 포함.
+GhostCrawlerV2_OriginalRest.fbx: 리깅과 원본 자세 포함, 애니메이션 없음.
+
+FBX 파일을 옮길 때는 같은 이름의 .fbm 폴더도 함께 옮기세요.
+Textures/GhostCrawler_BaseColor.jpg는 첨부해 주신 2048x2048 원본 텍스처와 동일한 파일입니다.
+
+Blender Action Editor에서 IDLE, WALK, RUN을 선택할 수 있습니다.
+원래 형태는 Armature의 Rest Position 또는 OriginalRest 파일에서 확인할 수 있습니다.
+
+3. 동작 구성
+
+IDLE: 1~91프레임, 3초. 호흡, 몸통의 미세한 흔들림, 고개 움직임.
+WALK: 1~49프레임, 1.6초. 손발을 차례대로 크게 옮기는 네발 보행.
+RUN: 1~25프레임, 0.8초. 대각선 손발 교차, 큰 손 뻗기와 들기, 더 강한 몸통 움직임.
+모두 30fps이며 끝 프레임은 루프 연결용 중복 프레임입니다.
+
+이전 버전 대비 전체 버텍스의 최대 이동 범위는 IDLE 약 3.8배, WALK 약 2.2배, RUN 약 2.4배입니다.
+RUN에서 손의 앞뒤 이동 범위는 약 28~34cm, 들어 올리는 높이는 약 11~13cm입니다.
+이는 원본 모델 크기 기준입니다.
+
+4. 모델과 리깅
+
+원본 5,234개 버텍스 / FBX 8,938개 삼각형 / 22개 본 / 버텍스당 최대 4개 본 영향.
+Unity는 Generic 리그입니다. 네발 원본 자세용이며 Humanoid 리타기팅용이 아닙니다.
+메쉬의 원래 좌표와 UV는 보존했고, 새 동작에 맞춰 스킨 가중치를 보정했습니다.
+머리카락은 머리 움직임을 따르며 옷자락 보조 동작은 본 애니메이션으로 구워져 있습니다.
+실시간 천 물리, 지형 대응 IK, 이동 AI와 충돌 설정은 포함하지 않습니다.
+첨부 텍스처는 색상 맵이며, 별도의 노멀/러프니스 텍스처는 추가로 생성하지 않았습니다.
+
+5. 확인 자료
+
+IDLE_Preview.gif / WALK_Preview.gif / RUN_Preview.gif: 텍스처 포함 동작 미리보기.
+Animation_ContactSheet.jpg: 주요 동작 비교.
+Bind_Front.png / Bind_Side.png / Bind_ThreeQuarter.png: 원본 자세의 텍스처 확인.
+Unity_IDLE.png / Unity_WALK.png / Unity_RUN.png: Unity 실행 화면.
+FBX_Validation.json: 원본 형태/UV/텍스처와 FBX 재가져오기 검증.
+Animation_Validation.json: 반복 연결, 보폭, 본 길이, 바닥 관통 확인.
+Unity_Validation.json / Unity_Runtime_Validation.json: Unity 가져오기 및 실제 재생 검증.
+Package_Import_Validation.json: Unity 패키지 가져오기 목록 생성 확인.
+
+기존 리깅과 첨부 원본 파일은 수정하지 않았습니다.
+패키지는 Unity의 기본 ExportPackage 기능으로 생성했습니다.

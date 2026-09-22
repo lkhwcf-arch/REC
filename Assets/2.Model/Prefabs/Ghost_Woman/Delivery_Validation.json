@@ -1,0 +1,19 @@
+{
+  "source_fbx_unchanged": true,
+  "source_sha256": "181200737c6e3d602dd1b62a377283a643198c6cb489a2fa612d946ca84be77b",
+  "texture_original_bytes_preserved": true,
+  "texture_sha256": "dfa8a856f7e5722ea07ab94d4eb66cf7d4984f451db2f017b5d1052efbfad3f6",
+  "original_rest_vertices_preserved": true,
+  "original_uvs_preserved": true,
+  "all_animation_frames_roundtrip_verified": true,
+  "unity_playmode_passed": true,
+  "native_package_import_tree_passed": true,
+  "package_item_count": 16,
+  "package_payload_hashes_match_loose_assets": 25,
+  "package_sha256": "9b7dc787396917b18f87c90d215df70087d9b8ba6e08f991a7eb65a425b8a18d",
+  "animation_max_vertex_travel_multiplier": {
+    "IDLE": 3.8240290809083826,
+    "WALK": 2.1599533196012395,
+    "RUN": 2.4370787225752353
+  }
+}
