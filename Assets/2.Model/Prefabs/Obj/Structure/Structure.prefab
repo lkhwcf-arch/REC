@@ -18891,7 +18891,8 @@ Transform:
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 856593698347529772}
   m_Father: {fileID: 8444222372404171119}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &7643449357805391627
@@ -96899,7 +96900,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8444222372404171119}
   m_Layer: 0
-  m_Name: BS_ColdDoor_L_16
+  m_Name: Direction_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96920,7 +96921,6 @@ Transform:
   m_Children:
   - {fileID: 1814592092844869191}
   - {fileID: 643888652331662530}
-  - {fileID: 856593698347529772}
   m_Father: {fileID: 5607345137305373134}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6157316230138382542
@@ -129008,12 +129008,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8313217408954361735}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8444222372404171119}
+  m_Father: {fileID: 643888652331662530}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2472703508728510511
 MeshFilter:
