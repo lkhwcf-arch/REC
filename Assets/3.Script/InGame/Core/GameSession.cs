@@ -168,6 +168,41 @@ namespace REC.Core
             try { BeginRound(data.GetData<RoundData>(RoundId).NextRoundID); return true; }
             catch (Exception exception) { Fault(exception); return false; }
         }
+#if UNITY_EDITOR
+        public bool RequestTestRound(int roundId, out string error)
+        {
+            error = null;
+
+            if (!started || IsTerminal)
+            {
+                error = "진행 중인 정상 세션에서만 회차 테스트를 시작할 수 있습니다.";
+                return false;
+            }
+
+            // 잘못된 회차 번호라면 현재 진행을 변경하지 않습니다.
+            try
+            {
+                data.GetData<RoundData>(roundId);
+            }
+            catch (Exception)
+            {
+                error = $"Round 테이블에 회차 ID={roundId}가 없습니다.";
+                return false;
+            }
+
+            try
+            {
+                BeginRound(roundId);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                error = exception.Message;
+                Fault(exception);
+                return false;
+            }
+        }
+#endif
         public void Stop(bool restoreMap = true) { if (started && restoreMap) anomalies.Reset(); started = false; }
         private bool AllResolved()
         {
