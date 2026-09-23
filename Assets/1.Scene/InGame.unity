@@ -2446,7 +2446,7 @@ Transform:
   m_GameObject: {fileID: 635112861}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.036, y: 8.902, z: -2.058}
+  m_LocalPosition: {x: -19.036, y: 8.902, z: -5.26}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3463,10 +3463,10 @@ MonoBehaviour:
     controller: {fileID: 0}
     height: 1.8
     facingOffset: 0
-  peekAnchor: {fileID: 0}
-  retreatAnchor: {fileID: 0}
-  approachAnchor: {fileID: 0}
-  closeAnchor: {fileID: 0}
+  peekAnchor: {fileID: 1042521290}
+  retreatAnchor: {fileID: 635112862}
+  approachAnchor: {fileID: 2053193741}
+  closeAnchor: {fileID: 943372537}
   peekOffset: {x: 0.25, y: 0, z: 0}
   approachSize: {x: 10, y: 3, z: 10}
   closeSize: {x: 3, y: 3, z: 3}
@@ -3615,7 +3615,7 @@ GameObject:
   m_Component:
   - component: {fileID: 943372537}
   m_Layer: 0
-  m_Name: Round4_TriggerAnchor (3)
+  m_Name: Round4_CloseAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3630,7 +3630,7 @@ Transform:
   m_GameObject: {fileID: 943372536}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.036, y: 8.902, z: -2.058}
+  m_LocalPosition: {x: -14.669, y: 8.902, z: 0.361}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5387,7 +5387,7 @@ Transform:
   m_GameObject: {fileID: 2053193740}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.036, y: 8.902, z: -2.058}
+  m_LocalPosition: {x: -11.364, y: 8.902, z: 0.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
