@@ -3,9 +3,14 @@ guid: 66966774285501348916ef5d839592a4
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: GhostCrawler_SuppliedTexture
+    second: {fileID: 2100000, guid: b087b58c14f34df4ab2288137a1bdda6, type: 2}
   materials:
-    materialImportMode: 0
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1
