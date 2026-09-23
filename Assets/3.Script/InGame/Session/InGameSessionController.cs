@@ -172,7 +172,7 @@ public class InGameSessionController : MonoBehaviour
         {
             changingScene = true; if (paused) SetPaused(false);
             Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
-            ResultRequested?.Invoke(message.Kind == "GameClear" ? "GameClear" : "GameOver");
+            ResultRequested?.Invoke(message.Kind == "GameClear" ? "Main Menu (Desktop)" : "GameOver");
         }
         ViewChanged?.Invoke();
     }
