@@ -98,7 +98,7 @@ public class InGameSceneBootstrapper : MonoBehaviour
                 string path = row.SceneBinding.Substring("Interection_Obj/Interaction/".Length);
                 string parent = path.Split('/')[0];
 
-                if (!int.TryParse(parent.Replace("I_", ""), out int number) || number < 1 || number > 13 || (number == 7 && path != "I_7/I_7_2"))
+                if (!int.TryParse(parent.Replace("I_", ""), out int number) || number < 1 || (number == 7 && path != "I_7/I_7_2"))
                     throw new InvalidOperationException($"TargetID={row.ID}: 허용되지 않은 대상 {path}");
                 sources[row.SceneBinding] = Required(mapRoot, row.SceneBinding);
             }

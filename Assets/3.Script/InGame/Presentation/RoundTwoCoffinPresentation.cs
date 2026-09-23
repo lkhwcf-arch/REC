@@ -133,9 +133,11 @@ public sealed class RoundTwoCoffinPresentation : MonoBehaviour
     private bool SpawnBehindPlayer()
     {
         Vector3 forward = Vector3.ProjectOnPlane(view.transform.forward, Vector3.up).normalized;
-        if (forward.sqrMagnitude < 0.5f) forward = player.transform.forward;
+        if (forward.sqrMagnitude < 0.5f) 
+            forward = player.transform.forward;
         Vector3 desired = player.transform.position - forward * spawnDistance;
         Physics.SyncTransforms();
+        
         if (!TryFloorPosition(desired, out Vector3 floor) &&
             (fallbackSpawn == null || !TryFloorPosition(fallbackSpawn.position, out floor)))
         {
@@ -155,8 +157,12 @@ public sealed class RoundTwoCoffinPresentation : MonoBehaviour
         // 벽 너머에 스폰하지 않고, 플레이어와 같은 층의 바닥으로 제한합니다.
         Vector3 origin = view.transform.position;
         Vector3 end = new(desired.x, origin.y, desired.z);
-        if (Physics.Linecast(origin, end, physicsMask, QueryTriggerInteraction.Ignore)) return false;
-        if (!Physics.Raycast(desired + Vector3.up, Vector3.down, out RaycastHit hit, 3f, physicsMask, QueryTriggerInteraction.Ignore) || hit.normal.y < 0.7f) return false;
+        if (Physics.Linecast(origin, end, physicsMask, QueryTriggerInteraction.Ignore)) 
+            return false;
+        
+        if (!Physics.Raycast(desired + Vector3.up, Vector3.down, out RaycastHit hit, 3f, physicsMask, QueryTriggerInteraction.Ignore) || hit.normal.y < 0.7f) 
+            return false;
+        
         floor = hit.point + Vector3.up * 0.02f;
         return !Physics.CheckCapsule(floor + Vector3.up * 0.25f, floor + Vector3.up * (ghostHeight - 0.25f), 0.22f, physicsMask, QueryTriggerInteraction.Ignore);
     }
