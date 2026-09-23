@@ -142,6 +142,7 @@ public sealed class RoundFourPresentation : MonoBehaviour
         previewEnding = preview;
         if (flow.IsPaused) flow.SetPaused(false);
         flow.SetEndingPreview(preview);
+        host.SetPresentationClockSuspended(this, true);
         interactor.CancelCurrentInteraction(); player.SetPresentationLock(this, true);
         approach.Arm(false); close.Arm(false); ghost.Hide();
         CaptureAmbience(); heartbeat.Stop(); fallbackAmbience.Stop();
@@ -150,6 +151,7 @@ public sealed class RoundFourPresentation : MonoBehaviour
     }
     private void CompleteEnding()
     {
+        host.SetPresentationClockSuspended(this, false);
         player.SetPresentationLock(this, false); flow.SetEndingPreview(false);
         RestoreAmbience(false); stage = Stage.Complete;
         if (!previewEnding) host.Session.RequestCompleteEnding();
@@ -157,6 +159,7 @@ public sealed class RoundFourPresentation : MonoBehaviour
     }
     private void ResetPresentation()
     {
+        if (host != null) host.SetPresentationClockSuspended(this, false);
         ghost?.Hide();
         if (approach != null) approach.Arm(false);
         if (close != null) close.Arm(false);

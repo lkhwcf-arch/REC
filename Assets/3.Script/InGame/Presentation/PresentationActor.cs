@@ -44,6 +44,7 @@ public sealed class PresentationActor : IDisposable
         direction = Vector3.ProjectOnPlane(direction, Vector3.up);
         Root.transform.SetPositionAndRotation(feet, Quaternion.LookRotation(direction.sqrMagnitude > 0.001f ? direction : Vector3.forward) * Quaternion.Euler(0, facingOffset, 0));
         Root.SetActive(true);
+        SetMotion(0);
     }
     public void SetMotion(int motion)
     {

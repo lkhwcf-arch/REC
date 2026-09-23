@@ -28,6 +28,13 @@ public class GameSessionHost : MonoBehaviour
     private double remainderMs;
     private bool initialized;
     private int endingQuestId;
+    private readonly HashSet<object> presentationClockLocks = new();
+    public void SetPresentationClockSuspended(object owner, bool suspended)
+    {
+        if (owner == null) return;
+        if (suspended) presentationClockLocks.Add(owner);
+        else presentationClockLocks.Remove(owner);
+    }
     public void ConfigureEndingQuest(int questId)
     {
         if (initialized) throw new InvalidOperationException("엔딩 미션은 세션 초기화 전에 연결하세요.");
@@ -73,7 +80,7 @@ public class GameSessionHost : MonoBehaviour
     }
     private void Update()
     {
-        if (Session == null || Time.timeScale <= 0 || !Application.isFocused)
+        if (Session == null || Time.timeScale <= 0 || !Application.isFocused || presentationClockLocks.Count > 0)
             return;
 
         remainderMs += Time.unscaledDeltaTime * 1000.0;

@@ -85,7 +85,7 @@ public class InGameSessionController : MonoBehaviour
         if (IsEnding) return;
         if (host.Session?.RequestSkip() != true) SetNotice("지금은 다음 일정으로 건너뛸 수 없습니다.");
     }
-    public void RequestNextRound() => host.Session?.RequestNextRound();
+    public void RequestNextRound() { if (!IsEnding) host.Session?.RequestNextRound(); }
     public void SetPaused(bool value)
     {
         if (IsEnding && value) return;

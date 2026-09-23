@@ -37,9 +37,8 @@ public sealed class PresentationScreenView : MonoBehaviour
     {
         if (camera != view || shakeStrength <= 0 || Time.timeScale <= 0 || !Application.isFocused) return;
         RestoreCamera(); appliedCamera = camera.transform; savedPosition = appliedCamera.position; savedRotation = appliedCamera.rotation;
-        appliedCamera.rotation = savedRotation * Quaternion.Euler(Mathf.Sin(shakeTime * 47f), Mathf.Sin(shakeTime * 61f), Mathf.Sin(shakeTime * 39f)) * Quaternion.identity;
-        // 각도를 강도로 보간하므로 원본 시점 회전은 누적되지 않습니다.
-        appliedCamera.rotation = Quaternion.SlerpUnclamped(savedRotation, appliedCamera.rotation, shakeStrength);
+        Vector3 angles = new Vector3(Mathf.Sin(shakeTime * 47f), Mathf.Sin(shakeTime * 61f), Mathf.Sin(shakeTime * 39f)) * shakeStrength;
+        appliedCamera.rotation = savedRotation * Quaternion.Euler(angles);
         appliedCamera.position = savedPosition + camera.transform.right * (Mathf.Sin(shakeTime * 71f) * shakeStrength * 0.01f);
     }
     private void EndCamera(ScriptableRenderContext _, Camera camera) { if (camera == view) RestoreCamera(); }
