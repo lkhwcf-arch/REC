@@ -3476,7 +3476,7 @@ MonoBehaviour:
   ambienceSources: []
   temporaryAmbience: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
   heartbeatClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
-  endingClip: {fileID: 0}
+  endingClip: {fileID: 32900000, guid: 2bc4195670065c44e80c99daa78a9dfa, type: 3}
   temporaryEndingSeconds: 2
   videoPrepareTimeout: 10
 --- !u!1 &926289882
