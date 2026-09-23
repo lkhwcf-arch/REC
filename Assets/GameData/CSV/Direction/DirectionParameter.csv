@@ -1,6 +1,5 @@
 ﻿ID,DirectionIDs,ParameterName,Value
-1,3,FadeDuration,1
-2,3,PlayerLockDuration,1
-5,9,DisappearDelay,2
-6,12,DisappearDelay,1
-7,13,DisappearDelay,2
+1,"1,3,5,7",ObjectClearTime,2
+2,4,PlayerInputBlockDuration,1
+3,"1,2",DoorOpenDelay,0.5
+4,6,BlackoutFlashCount,3

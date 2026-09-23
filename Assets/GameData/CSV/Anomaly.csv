@@ -10,7 +10,7 @@
 9,18,ObjectDeletion,ObjectAddition,9
 10,19,ObjectDeletion,ObjectAddition,10
 11,20,ObjectMovement,RestoreObjectState,11
-12,21,ObjectGroupMovement,RestoreObjectGroupState,12
+12,21,ObjectDeletion,ObjectAddition,12
 13,22,ObjectDeletion,ObjectAddition,13
 14,23,ObjectDeletion,ObjectAddition,14
 15,24,ObjectAddition,ObjectDeletion,15
