@@ -3474,8 +3474,8 @@ MonoBehaviour:
   closeSize: {x: 3, y: 3, z: 3}
   retreatSeconds: 5
   ambienceSources: []
-  temporaryAmbience: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
-  heartbeatClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+  temporaryAmbience: {fileID: 8300000, guid: 4d9a7e152c7a0da46a1a1e0ec2e60fe0, type: 3}
+  heartbeatClip: {fileID: 8300000, guid: 80a721b61d02d9042b097ddf010fc8cb, type: 3}
   endingClip: {fileID: 32900000, guid: 2bc4195670065c44e80c99daa78a9dfa, type: 3}
   temporaryEndingSeconds: 2
   videoPrepareTimeout: 10
