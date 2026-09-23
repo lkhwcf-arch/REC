@@ -5,10 +5,13 @@ using UnityEngine.Video;
 
 public sealed class RoundFourPresentation : MonoBehaviour
 {
-    [Header("데이터 이벤트 — 비활성 미션을 강제로 활성화하지 않습니다")]
+    [Header("회차 및 엔딩 미션 — 귀신 접근 연출은 미션과 독립")]
     [SerializeField] private int roundId = 4;
     [SerializeField] private int questId = 28;
     [SerializeField] private string portraitName = "I_14";
+    [Header("귀신 접근 연출 활성 시각 — 게임 시계 기준")]
+    [SerializeField, Range(0, 23)] private int activationHour = 3;
+    [SerializeField, Range(0, 59)] private int activationMinute = 30;
     [Header("남자 귀신 및 4빈소 배치")]
     [SerializeField] private PresentationActorSettings man = new();
     [SerializeField] private Transform peekAnchor;
@@ -77,8 +80,21 @@ public sealed class RoundFourPresentation : MonoBehaviour
     {
         if (message.Kind is "RoundStarted" or "GameOver" or "GameClear" or "ConfigurationError") { ResetPresentation(); return; }
         if (!isActiveAndEnabled || message.RoundId != roundId || message.QuestId != questId) return;
-        if (message.Kind == "MissionOpened") Open();
         if (message.Kind == "EndingStarted") BeginEnding(false);
+    }
+    private void TryActivateByClock()
+    {
+        var session = host.Session;
+        if (stage != Stage.Dormant || session == null || session.RoundId != roundId || session.IsTerminal ||
+            session.Phase is SessionPhase.Ending or SessionPhase.RoundComplete) return;
+
+        // 자정을 넘는 회차 시각을 경과 시간으로 비교하여 건너뛰기도 처리합니다.
+        int minuteOfDay = Mathf.Clamp(activationHour, 0, 23) * 60 + Mathf.Clamp(activationMinute, 0, 59);
+        int minutesFromStart = (minuteOfDay - session.Rules.StartMinute + 1440) % 1440;
+        long activationMs = minutesFromStart * session.Rules.MillisecondsPerMinute;
+        if (session.ElapsedMs < activationMs) return;
+        Open();
+        Debug.Log($"[4회차 연출] {activationHour:00}:{activationMinute:00} 도달 — 접근 감지 활성화", this);
     }
     private void Open()
     {
@@ -121,8 +137,10 @@ public sealed class RoundFourPresentation : MonoBehaviour
     }
     private void Update()
     {
-        if (!configured || stage == Stage.Dormant) return;
+        if (!configured) return;
         bool pause = Time.timeScale <= 0 || !Application.isFocused;
+        if (!pause) TryActivateByClock();
+        if (stage == Stage.Dormant) return;
         ghost.SetPaused(pause);
         if (paused != pause)
         {

@@ -3458,6 +3458,8 @@ MonoBehaviour:
   roundId: 4
   questId: 28
   portraitName: I_14
+  activationHour: 3
+  activationMinute: 30
   man:
     prefab: {fileID: 8962774763559999609, guid: 32aca342f28c578498fe92ad902e11db, type: 3}
     controller: {fileID: 0}
@@ -3470,7 +3472,7 @@ MonoBehaviour:
   peekOffset: {x: 0.25, y: 0, z: 0}
   approachSize: {x: 10, y: 3, z: 10}
   closeSize: {x: 3, y: 3, z: 3}
-  retreatSeconds: 1
+  retreatSeconds: 5
   ambienceSources: []
   temporaryAmbience: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
   heartbeatClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
