@@ -4037,8 +4037,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoundTwoCoffinPresentation
   roundId: 2
-  questId: 8
-  targetId: 4
+  questId: 11
+  targetId: 2
   ghostPrefab: {fileID: 919132149155446097, guid: c42e6f882cb2d2048b24816818132fa0, type: 3}
   ghostController: {fileID: 9100000, guid: 28df9f48b0c0d2e4aa80a48d7a4a34bb, type: 2}
   spawnDistance: 2
@@ -4069,7 +4069,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoundThreePresentation
   roundId: 3
-  questId: 15
+  questId: 18
   blanketName: SYNC_04__UNI_02_FoldedBlanket
   bloodName: I_15
   standingWoman:
@@ -5166,7 +5166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
   playerController: {fileID: 1312097968}
   playerCamera: {fileID: 330585545}
-  interactionDistance: 3
+  interactionDistance: 1
   holdDuration: 2
   interactionRayMask:
     serializedVersion: 2
@@ -167061,7 +167061,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoorOpenPresentation
   triggerEvent: MissionResolved
   roundId: 1
-  questId: 1
+  questId: 4
   targetId: 1
   duration: 2
   hinge: {fileID: 8948276442518232306}
