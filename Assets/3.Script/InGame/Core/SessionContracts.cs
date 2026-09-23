@@ -104,9 +104,13 @@ namespace REC.Core
         public readonly long OccurrenceId, ElapsedMs;
         public SessionEvent(string kind, int roundId, long elapsedMs, MissionRuntime mission = null)
         {
-            Kind = kind; RoundId = roundId; ElapsedMs = elapsedMs;
-            QuestId = mission?.QuestId ?? 0; TargetId = mission?.TargetId ?? 0;
-            DirectionGroupId = mission?.DirectionGroupId ?? 0; OccurrenceId = mission?.OccurrenceId ?? 0;
+            Kind = kind;
+            RoundId = roundId;
+            ElapsedMs = elapsedMs;
+            QuestId = mission?.QuestId ?? 0;
+            TargetId = mission?.TargetId ?? 0;
+            DirectionGroupId = mission?.DirectionGroupId ?? 0;
+            OccurrenceId = mission?.OccurrenceId ?? 0;
         }
     }
 }
