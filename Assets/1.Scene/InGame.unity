@@ -3422,7 +3422,7 @@ MonoBehaviour:
   crawlerWoman:
     prefab: {fileID: 919132149155446097, guid: 66966774285501348916ef5d839592a4, type: 3}
     controller: {fileID: 9100000, guid: 396d2e83b7ca0a44698edd3a6828b6d6, type: 2}
-    height: 1.8
+    height: 2
     facingOffset: 0
   standingAnchor: {fileID: 994913931}
   corridorAnchor: {fileID: 1920822845}
