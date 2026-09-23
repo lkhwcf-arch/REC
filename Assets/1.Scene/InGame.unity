@@ -3442,7 +3442,7 @@ MonoBehaviour:
   flashPeriod: 0.16
   flashOpacity: 0.9
   blackoutClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
-  rushClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
+  rushClip: {fileID: 8300000, guid: fb43965ef7509764aa15183eba1241b6, type: 3}
 --- !u!114 &900100007
 MonoBehaviour:
   m_ObjectHideFlags: 0
