@@ -157,16 +157,24 @@ namespace REC.Core
                 try
                 {
                     anomalies.Resolve(mission);
-                    if (AllResolved()) Phase = mission.QuestId == endingQuestId && data.GetData<RoundData>(RoundId).NextRoundID == 0
-                        ? SessionPhase.Ending : SessionPhase.AwaitFinalReturn;
-                    Publish("MissionResolved", mission);
+
+                    if (AllResolved())
+                    {
+                        bool isLastRound = data.GetData<RoundData>(RoundId).NextRoundID == 0;
+                        Phase = isLastRound ? SessionPhase.Ending : SessionPhase.AwaitFinalReturn;
+                    }
+
                     if (Phase == SessionPhase.Ending)
                         Publish("EndingStarted", mission);
                     if (Phase == SessionPhase.AwaitFinalReturn)
                         Publish("AllMissionsResolved");
                     return true;
                 }
-                catch (Exception exception) { Fault(exception); return false; }
+                catch (Exception exception)
+                {
+                    Fault(exception);
+                    return false;
+                }
             }
             return false;
         }
