@@ -25,6 +25,19 @@ public class InGameSceneBootstrapper : MonoBehaviour
     [SerializeField] private CctvPose[] cctvPoses = Array.Empty<CctvPose>();
     [Tooltip("기존 I_1~I_13 외에 데이터 테이블 등록 후 허용할 정확한 맵 경로입니다.")]
     [SerializeField] private string[] additionalTargetBindings = Array.Empty<string>();
+
+    [Header("일반 문 사운드")]
+    [SerializeField] private AudioClip doorOpenClip;
+    [SerializeField] private AudioClip doorCloseClip;
+
+    [SerializeField, Range(0f, 1f)]
+    private float doorVolume = 0.7f;
+
+    [SerializeField, Min(0.01f)]
+    private float doorMinDistance = 1f;
+
+    [SerializeField, Min(0.1f)]
+    private float doorMaxDistance = 12f;
     public GameSessionHost Host { get; private set; }
     public InGameSessionController Controller { get; private set; }
     public string Error { get; private set; }
@@ -166,7 +179,7 @@ public class InGameSceneBootstrapper : MonoBehaviour
 
     private void OnDestroy() { if (Controller != null) Controller.ResultRequested -= OnResultRequested; }
 
-    private static void BuildDoor(Transform source, Vector3 interior, DoorData row)
+    private void BuildDoor(Transform source, Vector3 interior, DoorData row)
     {
         Bounds bounds = GeometryBounds(source);
         Vector3 width = bounds.size.x >= bounds.size.z ? Vector3.right : Vector3.forward;
@@ -175,7 +188,14 @@ public class InGameSceneBootstrapper : MonoBehaviour
         var pivot = UnitRoot($"Door_{row.ID:000}", source.parent, hinge); source.SetParent(pivot, true);
         Vector3 lever = bounds.center - hinge, inward = interior - bounds.center; inward.y = 0;
         float sign = Vector3.Dot(Quaternion.Euler(0, row.OpenAngle, 0) * lever - lever, inward) >= 0 ? 1 : -1;
-        pivot.gameObject.AddComponent<DoorInteraction>().Configure(row, sign * row.OpenAngle);
+
+        DoorInteraction door = pivot.gameObject.AddComponent<DoorInteraction>();
+
+        door.Configure(row, sign * row.OpenAngle);
+
+        DoorAudioPlayer doorAudio = pivot.gameObject.AddComponent<DoorAudioPlayer>();
+
+        doorAudio.Configure(door, doorOpenClip, doorCloseClip, doorVolume, doorMinDistance, doorMaxDistance);
     }
     internal static Transform UnitRoot(string name, Transform parent, Vector3 position)
     {

@@ -33,6 +33,10 @@ public class PlayerController : MonoBehaviour
     private float verticalSpeed;
     private float pitch;
 
+    // 이번 프레임에 플레이어 조작으로 실제 수평 이동이 발생했는지 확인.
+    private bool movedThisFrame;
+    private int movementSampleFrame = -1;
+    public bool IsMoving => isActiveAndEnabled && CanControl && movementSampleFrame == Time.frameCount && movedThisFrame;
     private bool controlsActive;
     private bool applicationFocused = true;
     private int controlStartFrame = -1;
@@ -48,10 +52,16 @@ public class PlayerController : MonoBehaviour
     public void SetSessionControl(bool allowed) => sessionControlAllowed = allowed;
     public void Teleport(Vector3 position, Quaternion rotation)
     {
+         movedThisFrame = false;
+        movementSampleFrame = -1;
         characterController ??= GetComponent<CharacterController>();
-        characterController.enabled = false; transform.SetPositionAndRotation(position, rotation); characterController.enabled = true;
+        characterController.enabled = false; 
+        transform.SetPositionAndRotation(position, rotation); 
+        characterController.enabled = true;
         verticalSpeed = 0; pitch = 0;
-        if (cameraTarget != null) cameraTarget.localRotation = Quaternion.identity;
+        
+        if (cameraTarget != null) 
+            cameraTarget.localRotation = Quaternion.identity;
     }
 
     private bool CanControl =>
@@ -189,9 +199,15 @@ public class PlayerController : MonoBehaviour
         Vector3 velocity = direction * moveSpeed;
         velocity.y = verticalSpeed;
 
-        CollisionFlags flags = characterController.Move(
-            velocity * Time.deltaTime);
-
+        Vector3 positionBeforeMove = transform.position;
+        CollisionFlags flags = characterController.Move(velocity * Time.deltaTime);
+        Vector3 displacement = transform.position - positionBeforeMove;
+        displacement.y = 0f;
+        // 입력만 있고 벽에 막힌 경우에는 발소리를 재생하지 않음.
+        // 중력에 의한 수직 이동도 발소리 판정에서 제외.
+        float minimumDistance = 0.01f * Time.deltaTime;
+        movedThisFrame = canControl && input.sqrMagnitude > 0.0001f && displacement.sqrMagnitude > minimumDistance * minimumDistance;
+        movementSampleFrame = Time.frameCount;
         if ((flags & CollisionFlags.Above) != 0 &&
             verticalSpeed > 0f)
         {

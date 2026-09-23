@@ -158,8 +158,14 @@ namespace REC.Core
                 {
                     anomalies.Resolve(mission);
 
-                    if (AllResolved()) Phase = mission.QuestId == endingQuestId && data.GetData<RoundData>(RoundId).NextRoundID == 0
-                        ? SessionPhase.Ending : SessionPhase.AwaitFinalReturn;
+                    if (AllResolved())
+                    {
+                        // Phase = mission.QuestId == endingQuestId && data.GetData<RoundData>(RoundId).NextRoundID == 0
+                        // ? SessionPhase.Ending : SessionPhase.AwaitFinalReturn;
+
+                        bool isLastRound = data.GetData<RoundData>(RoundId).NextRoundID == 0;
+                        Phase = isLastRound ? SessionPhase.Ending : SessionPhase.AwaitFinalReturn;
+                    }
                     Publish("MissionResolved", mission);
 
                     if (Phase == SessionPhase.Ending)
@@ -270,7 +276,8 @@ namespace REC.Core
         private bool AllResolved()
         {
             foreach (MissionRuntime mission in missions)
-                if (mission.Status != MissionStatus.Resolved) return false;
+                if (mission.Status != MissionStatus.Resolved)
+                    return false;
             return missions.Count > 0;
         }
         private void Fault(Exception exception)
