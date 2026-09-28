@@ -45,7 +45,11 @@ public class InGameSceneBootstrapper : MonoBehaviour
     private void Awake()
     {
         if (player != null)
+        {
             player.SetSessionControl(false);
+            // 입력 잠금만으로는 중력이 멈추지 않습니다. 맵/세션/시작 위치 준비 후 활성화합니다.
+            player.enabled = false;
+        }
         foreach (var item in legacyTestObjects)
             if (item != null)
                 item.SetActive(false);
@@ -161,13 +165,18 @@ public class InGameSceneBootstrapper : MonoBehaviour
                 throw new InvalidOperationException(Host.Session?.Error ?? "회차 초기화 실패");
 
             Host.enabled = true;
+            player.enabled = true;
 
             Debug.Log($"[인게임 연결] 사물 {adapters.Count}개 / TargetID {rows.Length}개 / 문 {doorRows.Length}개 / 활성 미션 {data.GetAllData<QuestData>().Count(q => q.Enabled == 1)}개", this);
         }
         catch (Exception exception)
         {
             Error = exception.Message; if (Host != null) Host.enabled = false;
-            if (player != null) player.SetSessionControl(false);
+            if (player != null)
+            {
+                player.SetSessionControl(false);
+                player.enabled = false;
+            }
             Debug.LogError($"[인게임 연결 실패] {exception}", this);
         }
     }
