@@ -110,6 +110,7 @@ public sealed class RoundThreePresentation : MonoBehaviour
     }
     private void Resolve()
     {
+        standing.Hide();
         blood.SetActive(true);
         stage = Stage.Armed;
         corridor.Arm(true);
@@ -178,7 +179,9 @@ public sealed class RoundThreePresentation : MonoBehaviour
                 screen.ResetView();
                 audioSource.Stop();
                 crawler.SetMotion(0);
-                // 소멸이 명시되지 않은 귀신과 피 글씨는 다음 회차 초기화까지 유지합니다.
+                
+                crawler.SetMotion(0);
+                crawler.Hide();
             }
         }
     }
