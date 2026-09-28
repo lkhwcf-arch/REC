@@ -19,11 +19,11 @@ RenderSettings:
   m_FogMode: 1
   m_FogDensity: 0.01
   m_LinearFogStart: 3
-  m_LinearFogEnd: 20
+  m_LinearFogEnd: 28
   m_AmbientSkyColor: {r: 0.15686275, g: 0.15686275, b: 0.15686275, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 0.01
+  m_AmbientIntensity: 0.1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0, g: 0, b: 0, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -669,7 +669,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFootstepAudio
   player: {fileID: 1312097968}
   footstepLoop: {fileID: 8300000, guid: adbf0b189c6e6a348b279722fe33c866, type: 3}
-  volume: 0.7
+  volume: 0.3
 --- !u!82 &218517032
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2397,9 +2397,9 @@ MonoBehaviour:
   targetId: 0
   duration: 2
   overlay: {fileID: 1230186134}
-  noiseClip: {fileID: 8300000, guid: 40a94e3285b92494688a6ad0245e4be0, type: 3}
+  noiseClip: {fileID: 8300000, guid: 83e76e6fb4c45a44ba461178a3c58263, type: 3}
   opacity: 0.714
-  volume: 0.7
+  volume: 1
   visualRate: 20
 --- !u!82 &552682944
 AudioSource:
@@ -2673,13 +2673,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 635112861}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.036, y: 8.902, z: -5.26}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -19.07, y: 7.732, z: -3.71}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &653508490
 GameObject:
   m_ObjectHideFlags: 0
@@ -3721,7 +3721,7 @@ MonoBehaviour:
   - NonInterection/SYNC_04__UNI_02_FoldedBlanket
   doorOpenClip: {fileID: 8300000, guid: 739431d642a17474694581e129246465, type: 3}
   doorCloseClip: {fileID: 8300000, guid: 739431d642a17474694581e129246465, type: 3}
-  doorVolume: 0.7
+  doorVolume: 0.3
   doorMinDistance: 1
   doorMaxDistance: 12
 --- !u!114 &900100004
@@ -3756,8 +3756,8 @@ MonoBehaviour:
   targetId: 2
   ghostPrefab: {fileID: 919132149155446097, guid: c42e6f882cb2d2048b24816818132fa0, type: 3}
   ghostController: {fileID: 9100000, guid: 28df9f48b0c0d2e4aa80a48d7a4a34bb, type: 2}
-  spawnDistance: 2
-  ghostHeight: 1.7
+  spawnDistance: 0.7
+  ghostHeight: 1.85
   facingOffset: 0
   fallbackSpawn: {fileID: 0}
   viewportHalfSize: {x: 0.18, y: 0.25}
@@ -3814,8 +3814,8 @@ MonoBehaviour:
   shakeDegrees: 1.8
   flashPeriod: 0.16
   flashOpacity: 0.9
-  blackoutClip: {fileID: 8300000, guid: f60b7c31b6fb64e468b0a65ac38946cf, type: 3}
-  rushClip: {fileID: 8300000, guid: fb43965ef7509764aa15183eba1241b6, type: 3}
+  blackoutClip: {fileID: 8300000, guid: 4ee6fef1281413e43b35e076beae4fdd, type: 3}
+  rushClip: {fileID: 8300000, guid: 9e0399aa48c87a44fbcc702d389e39c1, type: 3}
 --- !u!114 &900100007
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3845,7 +3845,7 @@ MonoBehaviour:
   peekOffset: {x: 0.25, y: 0, z: 0}
   approachSize: {x: 10, y: 3, z: 10}
   closeSize: {x: 3, y: 3, z: 3}
-  retreatSeconds: 5
+  retreatSeconds: 2
   ambienceSources: []
   temporaryAmbience: {fileID: 8300000, guid: 4d9a7e152c7a0da46a1a1e0ec2e60fe0, type: 3}
   heartbeatClip: {fileID: 8300000, guid: 80a721b61d02d9042b097ddf010fc8cb, type: 3}
@@ -4005,7 +4005,7 @@ Transform:
   m_GameObject: {fileID: 943372536}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -14.669, y: 8.902, z: 0.361}
+  m_LocalPosition: {x: -10.71, y: 8.902, z: 0.361}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4163,7 +4163,7 @@ Transform:
   m_GameObject: {fileID: 994913930}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.588, y: 8.416, z: -17.726}
+  m_LocalPosition: {x: -13.05, y: 8, z: -18.74}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4509,15 +4509,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4816703437337531121, guid: b0ef0365f0d71b4479feb2c1f2761869, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5
+      value: -4.55
       objectReference: {fileID: 0}
     - target: {fileID: 4816703437337531121, guid: b0ef0365f0d71b4479feb2c1f2761869, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 3.6
+      value: 3.5
       objectReference: {fileID: 0}
     - target: {fileID: 4816703437337531121, guid: b0ef0365f0d71b4479feb2c1f2761869, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 5
+      value: 4.5
       objectReference: {fileID: 0}
     - target: {fileID: 4816703437337531121, guid: b0ef0365f0d71b4479feb2c1f2761869, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5750,11 +5750,11 @@ Light:
   m_GameObject: {fileID: 1564238561}
   m_Enabled: 1
   serializedVersion: 11
-  m_Type: 2
+  m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
-  m_Intensity: 0.05
+  m_Intensity: 3
   m_Range: 10
-  m_SpotAngle: 30
+  m_SpotAngle: 179
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
@@ -5814,13 +5814,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1564238561}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.05, y: 10.97, z: 0.05}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -6.05, y: 12.01, z: -0.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1616850077
 GameObject:
   m_ObjectHideFlags: 0
@@ -5877,11 +5877,11 @@ Light:
   m_GameObject: {fileID: 1616850077}
   m_Enabled: 1
   serializedVersion: 11
-  m_Type: 2
+  m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
-  m_Intensity: 0.1
+  m_Intensity: 5
   m_Range: 10
-  m_SpotAngle: 30
+  m_SpotAngle: 179
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
@@ -5941,13 +5941,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1616850077}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -18.86, y: 10.97, z: 0.05}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -18.86, y: 11.67, z: -0.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1646034744
 GameObject:
   m_ObjectHideFlags: 0
@@ -6156,11 +6156,11 @@ Light:
   m_GameObject: {fileID: 1696066705}
   m_Enabled: 1
   serializedVersion: 11
-  m_Type: 2
+  m_Type: 0
   m_Color: {r: 1, g: 1, b: 1, a: 0.39215687}
-  m_Intensity: 0.05
+  m_Intensity: 3
   m_Range: 10
-  m_SpotAngle: 30
+  m_SpotAngle: 179
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
   m_Shadows:
@@ -6220,13 +6220,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1696066705}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.754, y: 10.97, z: 0.05}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.754, y: 11.96, z: -0.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1710778854
 GameObject:
   m_ObjectHideFlags: 0
@@ -6520,7 +6520,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameAmbienceAudio
   cameraManager: {fileID: 691565388}
   ambienceLoop: {fileID: 8300000, guid: 4d9a7e152c7a0da46a1a1e0ec2e60fe0, type: 3}
-  volume: 0.5
+  volume: 0.6
 --- !u!82 &1752828318
 AudioSource:
   m_ObjectHideFlags: 0
@@ -6534,7 +6534,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 4d9a7e152c7a0da46a1a1e0ec2e60fe0, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.6
   m_Pitch: 1
   Loop: 0
   Mute: 0
@@ -6942,7 +6942,7 @@ Transform:
   m_GameObject: {fileID: 2053193740}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -11.364, y: 8.902, z: 0.23}
+  m_LocalPosition: {x: -7.832, y: 8.902, z: 0.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -166801,11 +166801,11 @@ MonoBehaviour:
   duration: 2
   hinge: {fileID: 8948276442518232306}
   localAxis: {x: 0, y: 1, z: 0}
-  openAngle: 60
-  delay: 0.5
-  openClip: {fileID: 8300000, guid: 40a94e3285b92494688a6ad0245e4be0, type: 3}
+  openAngle: 90
+  delay: 0.1
+  openClip: {fileID: 8300000, guid: 4adf5aa90c7f075468386e99af02bb01, type: 3}
   outputGroup: {fileID: 0}
-  volume: 0.7
+  volume: 0.35
   minDistance: 1
   maxDistance: 12
 --- !u!82 &6743366043626121152

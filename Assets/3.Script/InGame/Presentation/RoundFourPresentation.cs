@@ -65,6 +65,12 @@ public sealed class RoundFourPresentation : MonoBehaviour
         retreatPosition = retreatAnchor != null ? retreatAnchor.position : PresentationSceneLookup.Floor(portraitBounds.center);
         facing = Vector3.ProjectOnPlane(peekPosition - retreatPosition, Vector3.up);
         ghost = new PresentationActor(transform, "Round4_MaskedHumanoid", man);
+        if (ghost != null && ghost.Root != null)
+        {
+            ghost.Root.transform.localScale = new Vector3(1.25f, 1.25f, 1.25f);
+        }
+
+
         approach = PresentationTriggerVolume.Create(transform, "Round4_ApproachTrigger", approachAnchor, peekPosition + Vector3.up * 1.2f, approachSize, player);
         close = PresentationTriggerVolume.Create(transform, "Round4_CloseTrigger", closeAnchor, peekPosition + Vector3.up * 1.2f, closeSize, player);
         approach.Entered += BeginHeartbeat; close.Entered += BeginRetreat;
