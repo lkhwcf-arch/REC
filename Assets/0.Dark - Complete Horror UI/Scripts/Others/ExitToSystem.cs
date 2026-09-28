@@ -6,8 +6,13 @@ namespace Michsky.UI.Dark
     {
         public void ExitGame()
         {
-            Debug.Log("Exit method is working in builds.");
+            Debug.Log("Exit method triggered.");
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
             Application.Quit();
+#endif
         }
     }
 }
