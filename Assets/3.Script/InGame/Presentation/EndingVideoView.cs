@@ -19,17 +19,36 @@ public sealed class EndingVideoView : MonoBehaviour
     {
         canvasRoot = new GameObject("EndingCanvas", typeof(RectTransform), typeof(Canvas), typeof(GraphicRaycaster));
         canvasRoot.transform.SetParent(transform, false);
-        var canvas = canvasRoot.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 500;
-        var panel = new GameObject("Video", typeof(RectTransform), typeof(RawImage)); panel.transform.SetParent(canvasRoot.transform, false);
+
+        var canvas = canvasRoot.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 500;
+        // 영상과 별개로 인게임 화면 전체를 가리는 불투명 배경.
+        var backgroundObject = new GameObject("BlackBackground", typeof(RectTransform), typeof(Image));
+
+        backgroundObject.transform.SetParent(canvasRoot.transform, false);
+
+        var background = backgroundObject.GetComponent<Image>();
+        background.color = new Color(0f, 0f, 0f, 1f);
+        background.raycastTarget = true;
+
+        Stretch(background.rectTransform);
+
+        var panel = new GameObject("Video", typeof(RectTransform), typeof(RawImage));
+        panel.transform.SetParent(canvasRoot.transform, false);
+
         image = panel.GetComponent<RawImage>(); image.color = Color.black; image.raycastTarget = true;
         Stretch(image.rectTransform);
         var label = new GameObject("TemporaryEnding", typeof(RectTransform), typeof(Text)); label.transform.SetParent(canvasRoot.transform, false);
+
         placeholder = label.GetComponent<Text>(); Stretch(placeholder.rectTransform);
         font = Font.CreateDynamicFontFromOSFont(new[] { "Malgun Gothic", "Arial" }, 28);
         placeholder.font = font; placeholder.fontSize = 28; placeholder.alignment = TextAnchor.MiddleCenter; placeholder.raycastTarget = false;
         placeholder.text = "임시 엔딩\n영상 준비 후 교체됩니다.";
+
         video = gameObject.AddComponent<VideoPlayer>(); video.playOnAwake = false; video.isLooping = false;
         video.renderMode = VideoRenderMode.RenderTexture; video.aspectRatio = VideoAspectRatio.FitInside;
+
         var audio = gameObject.AddComponent<AudioSource>(); audio.playOnAwake = false; audio.spatialBlend = 0;
         video.audioOutputMode = VideoAudioOutputMode.AudioSource; video.controlledAudioTrackCount = 1; video.SetTargetAudioSource(0, audio);
         video.prepareCompleted += OnPrepared; video.loopPointReached += OnEnded; video.errorReceived += OnError;
@@ -40,7 +59,13 @@ public sealed class EndingVideoView : MonoBehaviour
     {
         Stop();
         running = true; elapsed = 0; temporarySeconds = Mathf.Max(0.1f, fallbackDuration); prepareTimeout = Mathf.Max(1, timeout);
-        canvasRoot.SetActive(true); placeholder.enabled = clip == null; image.color = Color.black;
+        
+        canvasRoot.SetActive(true);
+        placeholder.enabled = clip == null;
+
+        image.enabled = false;
+        image.color = Color.white;
+        
         temporary = clip == null;
         if (temporary) return;
         texture = new RenderTexture(1920, 1080, 0); texture.Create(); image.texture = texture;
@@ -48,17 +73,31 @@ public sealed class EndingVideoView : MonoBehaviour
     }
     private void OnPrepared(VideoPlayer source)
     {
-        if (!running || temporary) return;
-        prepared = true; image.color = Color.white;
-        if (Application.isFocused && Time.timeScale > 0) source.Play();
+        if (!running || temporary) 
+            return;
+        
+        prepared = true; 
+        
+        image.color = Color.white;
+        image.enabled = true;
+        
+        if (Application.isFocused && Time.timeScale > 0) 
+            source.Play();
     }
     private void OnEnded(VideoPlayer _) => Finish();
     private void OnError(VideoPlayer _, string message)
     {
-        if (!running) return;
+        if (!running) 
+            return;
         Debug.LogWarning("[엔딩] 영상 재생 실패, 임시 화면으로 전환: " + message, this);
-        video.Stop(); temporary = true; prepared = false; elapsed = 0;
-        placeholder.enabled = true; image.color = Color.black;
+        
+        video.Stop(); 
+        temporary = true; 
+        prepared = false; 
+        
+        elapsed = 0;
+        placeholder.enabled = true;
+        image.enabled = false;
     }
     private void Update()
     {

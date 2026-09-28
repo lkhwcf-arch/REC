@@ -17,6 +17,9 @@ Unity 6 기반 3D 공포 게임입니다. 플레이어는 CCTV로 이상현상�
 | 3회차 귀신 소멸 변경 | 해결 즉시 스탠딩 숨김, 돌진 종료 즉시 돌진 귀신 숨김으로 수정 |
 | 4회차 03:30 귀신·접근 사운드·퇴장 | 미션과 독립하도록 수정, 사용자 작동 확인 |
 | 임시 엔딩 / 영상 교체 슬롯 | 구현, 미리보기 가능 |
+| 발소리 | 실제 이동 판정 및 전용 재생 코드 반영, 청취 확인 필요 |
+| 환경음 | 플레이어 시점 재생 / CCTV 확인 중 일시정지 코드 반영 |
+| 일반 문 열림·닫힘 소리 | 토글 상호작용·동작 이벤트·3D 사운드 연결 반영 |
 | 모든 미션 해결 → 영상 → Main Menu | **전환 작업 진행 중, 아직 완성 아님** |
 
 ### 현재 코드의 중요 주의사항
@@ -24,10 +27,10 @@ Unity 6 기반 3D 공포 게임입니다. 플레이어는 CCTV로 이상현상�
 문서 작성 시 확인한 실제 상태입니다. 이번 문서 작업에서는 코드를 수정하지 않았습니다.
 
 1. `GameSession.RequestResolve`는 마지막 회차의 모든 배정 미션 해결 시 `Ending`으로 전환하도록 바뀌었습니다.
-2. 그러나 해당 메서드에서 **`Publish("MissionResolved", mission)` 호출이 누락**되어 있습니다. 해결 완료 이벤트에 의존하는 1~3회차 연출이 실행되지 않을 수 있으므로 복원이 필요합니다. 기존 플레이 성공 기록을 현재 코드 전체의 정상 동작 보장으로 해석하면 안 됩니다.
+2. `Publish("MissionResolved", mission)` 발행은 현재 코드에 복원되어 있습니다. 연출이 실행되지 않으면 해결 로그의 Round/Quest/Target ID와 Inspector 필터를 비교하세요.
 3. `RoundFourPresentation.Handle`에는 아직 **Quest 28 필터**가 있습니다. 다른 미션이 마지막으로 해결되면 엔딩 상태에는 진입하지만 영상이 시작되지 않을 수 있습니다. `EndingStarted` 수신을 특정 미션 ID와 분리해야 합니다.
 4. `InGameSessionController`의 완료 목적지는 아직 **GameClear**입니다. 최종 목표인 **Main Menu (Desktop)**으로의 변경은 남아 있습니다.
-5. 영정사진 미션은 비활성 상태입니다. 4회차 귀신 접근 연출은 이 미션과 관계없이 동작합니다.
+5. 최신 CSV에서 영정사진 Quest 28은 활성화되어 있으며 Target 4가 I_14에 연결되어 있습니다. 4회차 귀신 접근 연출은 이 미션과 관계없이 03:30에 활성화됩니다.
 
 최종 목표는 **마지막 회차의 모든 배정 미션 해결 → 엔딩 영상(없으면 임시 화면) → Main Menu (Desktop)**입니다. GameClear 씬을 최종 동선에 사용하지 않을 계획이며, 내부 완료 상태·이벤트 이름은 씬 이름과 별개로 유지할 수 있습니다.
 
@@ -132,7 +135,25 @@ Direction 계열 등 폴더에 존재하는 모든 CSV를 자동으로 실행하
 - Offset의 기획 단위는 cm입니다. 예: 50cm는 Unity 0.5m입니다. 회전은 도 단위이며, 입력 데이터의 단위 표현과 검증 규칙도 함께 확인해야 합니다.
 - 미완성 미션 활성화 시 Quest뿐 아니라 Schedule·Round의 배정 수와 Target 연결도 함께 검토합니다.
 
-현재 3회차 Quest 15는 I_3 베개 미션입니다. 이불 `SYNC_04__UNI_02_FoldedBlanket`은 연출 위치 기준으로 사용하며, 이불 자체의 신규 미션을 임의 등록하지 않았습니다. 4회차 Quest 28 영정사진 미션은 비활성 상태로 유지합니다.
+최신 저장된 CSV와 InGame 씬의 고정 사건 연결은 다음과 같습니다. ID는 영구 고정 규칙이 아니라 현재 콘텐츠 값입니다.
+
+| 회차 | Quest ID | Target ID | 시각 / RealTime | 대상 |
+|---|---:|---:|---|---|
+| 1 | 4 | 1 | 01:30 / 525000 | I_1 꽃병 |
+| 2 | 11 | 2 | 01:30 / 525000 | I_2/I_2_2 관 뚜껑 |
+| 3 | 18 | 3 | 01:30 / 525000 | I_3 베개 |
+| 4 | 28 | 4 | 03:30 / 825000 | I_14 영정사진 |
+
+네 고정 사건 모두 현재 CSV에서 Enabled=1입니다. 3회차 이불 `SYNC_04__UNI_02_FoldedBlanket`은 귀신 배치 기준이며, 실제 복구 대상은 현재 I_3 베개입니다. 기존 상세 가이드에 적힌 Quest 1/8/15 및 비활성 영정사진 설명은 이전 데이터 기준입니다.
+
+### ID·시각 변경 시 확인
+
+1. Quest의 `RealTime`은 발생 시각이고, `ID`는 연출 매칭에 쓰는 식별자입니다. 시간을 바꾼다고 ID를 반드시 바꿀 필요는 없습니다.
+2. Quest ID나 Target ID를 변경하면 참조 테이블과 Inspector의 해당 필터도 함께 맞춥니다. 코드의 필드 기본값보다 저장된 씬의 직렬화 값이 우선합니다.
+3. 1회차는 `DoorOpenPresentation`이 부모 `PresentationEffect.Matches`의 Event/Round/Quest/Target 필터를 사용합니다. 고정 미션(SpawnType=0)을 자동 식별하는 방식은 아직 아닙니다.
+4. `InGameCore → Presentation Director → Effects`에서 문 연출 참조를 찾아 대상 컴포넌트로 이동할 수 있습니다. 1회차 현재 값은 MissionResolved / Round 1 / Quest 4 / Target 1입니다.
+5. ID 필터를 모두 0으로 풀면 랜덤 사건 해결에도 발동할 수 있으므로 고정 사건 연결을 대신하는 방법으로 사용하지 않습니다.
+6. CSV 저장 및 Unity 임포트 후 Play를 새로 시작합니다. 실행 중 기존 DataManager가 자동으로 CSV를 재로드하지 않습니다.
 
 ## 6. 구조와 책임
 
@@ -142,7 +163,7 @@ Assets/
 ├─ 2.Model/Prefabs/Obj/     # 맵 사물과 문 프리팹
 ├─ 3.Script/
 │  ├─ Data/                 # 행 정의, 파싱·매핑, 저장소, 검증
-│  ├─ Audio/                # 복구 사운드 설정·재생·이벤트 연결
+│  ├─ Audio/                # 복구·발소리·환경음·문 소리
 │  ├─ InGame/
 │  │  ├─ Core/              # 세션·미션·추첨·이상현상 규칙
 │  │  ├─ Session/           # Bootstrapper, Host, Controller, HUD, 맵 초기화
@@ -182,11 +203,43 @@ Tools/                      # 독립 규칙·참조 컴파일 검사
 
 흰색 하이라이트의 농도·굵기는 Inspector에서 설정합니다. 실제 사물 메시의 피벗과 표시 중심은 다를 수 있으므로 연출 위치는 전용 앵커로 지정합니다.
 
+### 상호작용 거리
+
+`Player → Player Interactor → Interaction Distance`로 조준 가능한 최대 거리를 조정합니다. 현재 저장된 InGame 씬 값은 **1.8m**, 스크립트 기본값은 3m입니다. 코드 기본값 변경만으로 기존 씬 설정이 덮어써지지는 않습니다.
+
+거리 기준은 카메라에서 감지 Collider 표면까지입니다. 특정 사물만 멀리서 잡히면 InteractionArea의 크기도 확인하세요. 회차 연출의 Corridor/Approach/Close 트리거 크기는 별도 설정이며 이 값을 줄여도 달라지지 않습니다.
+
 ### 오디오
 
 `RecoveryAudioBinder`가 플레이어 상호작용 이벤트를 `RecoveryAudioPlayer`에 연결하고, 설정 에셋에서 복구 종류별 음원을 선택합니다. 홀드 시작부터 완료·취소까지 재생하며 모든 전환은 Cut입니다. `dummy.wav` 및 현재 테스트 음원은 임시 자원입니다.
 
 4회차 Ambience Sources에는 씬의 AudioSource를 연결합니다. 비어 있으면 Temporary Ambience를 사용합니다. 환경음은 접근 시 음소거하고 퇴장 완료 후 원래 음소거 상태로 복구합니다.
+
+#### 발소리
+
+- `PlayerController`가 CharacterController.Move 전후 수평 변위를 비교합니다. 입력이 있어도 벽에 막혀 실제로 움직이지 않으면 재생하지 않습니다.
+- `movementSampleFrame = Time.frameCount` 기록과 `IsMoving` 속성으로 현재 프레임의 이동 결과를 제공합니다. Teleport에서는 판정을 초기화합니다.
+- `PlayerFootstepAudio`가 LateUpdate에서 결과를 읽고 2D 반복 음원을 재생합니다. 이동 종료·조작 제한·일시정지·포커스 해제 시 즉시 정지합니다.
+- Player 및 Footstep Loop 슬롯을 연결합니다. 발소리 AudioSource는 복구 소리와 공유하지 않습니다. 발소리의 보행 간격은 현재 반복 클립 자체에 따릅니다.
+
+#### 환경음
+
+- `GameAmbienceAudio`가 CameraManager.ModeChanged를 구독하고 플레이어 시점에서 재생합니다. CCTV실 위치만으로 차단하지 않고 **CCTV 화면 확인 중** Pause합니다.
+- 플레이어 시점 복귀 시 UnPause하여 멈춘 위치부터 이어집니다. 일시정지·포커스 해제도 처리합니다. 페이드는 없습니다.
+- Camera Manager와 Ambience Loop를 연결합니다. 전용 AudioSource는 2D 반복 재생입니다.
+- 같은 AudioSource를 `Round Four Presentation → Ambience Sources`에 연결해야 심장박동 중 환경음이 함께 들리지 않습니다. 이 배열에는 음원 파일이 아닌 씬의 AudioSource가 들어갑니다.
+- CCTV 제어는 Pause/UnPause, 4회차 연출은 mute/원래 mute 복구를 사용합니다. 한쪽이 끝났다고 다른 쪽의 차단을 해제하지 않도록 책임을 구분합니다.
+
+#### 일반 문 소리
+
+- `DoorInteraction`은 클릭으로 열기/닫기를 번갈아 수행합니다. 회전 중에는 추가 상호작용을 막고 완료 후 다시 허용합니다.
+- 실제 동작 시작 시 `MotionStarted(bool opening)`, 초기화·취소 시 `MotionCancelled`를 전달합니다.
+- `DoorAudioPlayer`는 이벤트를 받아 열림/닫힘 클립을 3D로 한 번 재생합니다. 클립은 끝까지 재생하되 다음 동작·초기화·비활성화 시 즉시 끊습니다. 회차 초기화로 문이 닫힐 때는 닫힘 소리를 내지 않습니다.
+- Bootstrapper의 BuildDoor에서 DoorInteraction, DoorAudioPlayer, AudioSource를 연결합니다. 프리팹마다 직접 컴포넌트를 붙일 필요는 없습니다.
+- `InGameCore → In Game Scene Bootstrapper`의 Door Open Clip, Door Close Clip, Door Volume, Door Min/Max Distance를 설정합니다. 테이블에 등록된 일반 문이 공통 설정을 사용합니다.
+- 1회차 냉장고 문은 일반 문 사운드와 별개이며 DoorOpenPresentation의 Open Clip을 사용합니다.
+
+세 신규 오디오 기능은 코드 반영을 확인했습니다. 실제 청취 성공, 음원 품질, 볼륨 밸런스는 별도 플레이 확인이 필요합니다.
 
 ### 회차 초기화와 입력 잠금
 
@@ -196,7 +249,7 @@ Tools/                      # 독립 규칙·참조 컴파일 검사
 
 ## 8. 회차별 연출 설정
 
-아래는 구현된 연출의 의도와 연결입니다. 현재 MissionResolved 누락으로 인한 영향은 1절을 먼저 확인하세요.
+아래는 구현된 연출의 의도와 연결입니다. 데이터 ID 변경 시 5절의 현재 연결표와 Inspector 조건을 함께 확인하세요.
 
 ### 1회차: 냉장고 문
 
@@ -282,18 +335,19 @@ dotnet run --project Tools/CoreChecks/CoreChecks.csproj
 | PresentationChecks 351 assertions | 엔딩 조건 변경 이전 통과 기록 |
 | 3회차 소멸 / 4회차 시각 활성화 수정 | 당시 참조 컴파일 통과 |
 | 사용자 플레이 확인 | 복구 소리, 노이즈, 1회차 문, 4회차 등장·접근·퇴장 등 대화에서 확인된 범위 |
-| 최신 엔딩 전환 및 MissionResolved 누락 | 검증·수정 필요 |
+| 최신 엔딩 전환 | Quest 필터·메뉴 목적지 수정 및 검증 필요 |
 
 현재 PresentationChecks에는 이전의 영정사진 전용 엔딩·최종 복귀 기대값이 남아 있습니다. 최신 전체 해결 엔딩 규칙에 맞춰 검사를 갱신해야 합니다. 문서 작성만으로 검사를 재실행하거나 성공 기록을 갱신하지 않습니다. 자동 도메인 검사는 Unity 배치·물리·청취·영상·씬 전환 확인을 대신하지 않습니다.
 
 ## 11. 남은 작업과 협업 규칙
 
-1. 해결 완료 이벤트 발행을 복원하고 1~3회차 연출 회귀 확인.
+1. 변경된 Quest/Target ID와 1~3회차 연출 필터를 맞추고 회귀 확인. 해결 이벤트 발행은 복원된 상태.
 2. EndingStarted 수신을 미션 ID 필터와 분리하고 완료 목적지를 Main Menu (Desktop)으로 변경.
 3. 엔딩 규칙 검사 갱신 및 전체 해결 → 임시 엔딩 → 메뉴 복귀 플레이 확인.
-4. 확정된 데이터 기준으로 이불·영정사진 대상과 미완성 미션 정리. 사건 시간은 사용자 결정 없이 변경하지 않음.
+4. 최신 테이블 전체 참조·배정 수·씬 연결 검증. 이불 기획과 현재 베개 대상 차이 정리. 사건 시간은 사용자 결정 없이 변경하지 않음.
 5. 최종 엔딩 영상·사운드·안광 등 임시 자원 교체.
-6. 회차 초기화, 일시정지, 벽 가림, 트리거 중복 진입 및 실제 맵 성능 측정.
+6. 발소리·CCTV 환경음·문 사운드 청취 확인 및 환경음/심장박동 동시 차단 검증.
+7. 회차 초기화, 일시정지, 벽 가림, 트리거 중복 진입 및 실제 맵 성능 측정.
 
 - 가이드나 검토만 요청받은 경우 코드·씬을 수정하지 않습니다.
 - 사용자가 편집한 씬·프리팹·테이블을 임의로 되돌리지 않습니다.

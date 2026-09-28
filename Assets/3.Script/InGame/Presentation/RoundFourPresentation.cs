@@ -78,9 +78,15 @@ public sealed class RoundFourPresentation : MonoBehaviour
     }
     private void Handle(SessionEvent message)
     {
-        if (message.Kind is "RoundStarted" or "GameOver" or "GameClear" or "ConfigurationError") { ResetPresentation(); return; }
-        if (!isActiveAndEnabled || message.RoundId != roundId || message.QuestId != questId) return;
-        if (message.Kind == "EndingStarted") BeginEnding(false);
+        if (message.Kind is "RoundStarted" or "GameOver" or "GameClear" or "ConfigurationError")
+        {
+            ResetPresentation();
+            return;
+        }
+        if (!isActiveAndEnabled || message.RoundId != roundId)
+            return;
+        if (message.Kind == "EndingStarted") 
+            BeginEnding(false);
     }
     private void TryActivateByClock()
     {
