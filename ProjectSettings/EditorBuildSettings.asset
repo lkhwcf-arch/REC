@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/1.Scene/Start.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: Assets/1.Scene/Main Menu (Desktop).unity
+    guid: de5ae19c8302feb4cb3f2f4cf9a266d9
   - enabled: 1
     path: Assets/1.Scene/InGame.unity
     guid: e50aa314465036546a29976cab3e5d9a
@@ -17,9 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/1.Scene/GameClear.unity
     guid: e51e53512a2abfa4f961b4ee95787158
-  - enabled: 1
-    path: Assets/1.Scene/Main Menu (Desktop).unity
-    guid: de5ae19c8302feb4cb3f2f4cf9a266d9
+  - enabled: 0
+    path: Assets/1.Scene/Start.unity
+    guid: 99c9720ab356a0642a771bea13969a05
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
